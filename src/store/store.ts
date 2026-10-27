@@ -3,6 +3,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { newId } from '../lib/ids';
 import { baseUnit, sameDimension, UNIT_INFO } from '../lib/units';
 import { priceProduct, rowCost } from '../lib/pricing';
+import { insumoComplete, linkedInsumo } from '../lib/insumoLink';
 import { normalizeAppData } from './normalize';
 import {
   SEED_PASTEL_ID,
@@ -50,6 +51,12 @@ export interface Actions {
   addRow: () => string;
   updateRow: (id: string, patch: RowPatch) => void;
   removeRow: (id: string) => void;
+  /** Appends one row per insumo (in order), filled from it; replaces a single completely blank row. Returns the new row ids. */
+  addRowsFromInsumos: (insumoIds: string[]) => string[];
+  /** Overwrites name, presentación, unidad y precio of the row with the insumo's (keeps the quantity used). */
+  fillRowFromInsumo: (rowId: string, insumoId: string) => void;
+  /** Same as fillRowFromInsumo with the row's linked insumo (no-op when there is none). */
+  syncRowFromInsumo: (rowId: string) => void;
   /** "Empezar de cero": blank draft, editingId null, settings untouched. */
   resetDraft: () => void;
   /** Draft = fresh copy of the sample Pastel; editingId = that product if it still exists. */
@@ -83,6 +90,22 @@ export interface StoreState extends AppData {
 
 /** The part of the state that is persisted. */
 type Persisted = AppData;
+
+function isBlankRow(r: IngredientRow): boolean {
+  return (
+    r.name.trim() === '' && r.pack.trim() === '' && r.price.trim() === '' && r.used.trim() === '' && !r.insumoId
+  );
+}
+
+function insumoFields(ins: Insumo): Pick<IngredientRow, 'name' | 'pack' | 'packUnit' | 'price' | 'insumoId'> {
+  return { name: ins.name, pack: ins.pack, packUnit: ins.unit, price: ins.price, insumoId: ins.id };
+}
+
+function applyInsumo(r: IngredientRow, ins: Insumo): IngredientRow {
+  const next: IngredientRow = { ...r, ...insumoFields(ins) };
+  if (!sameDimension(next.packUnit, next.useUnit)) next.useUnit = baseUnit(UNIT_INFO[next.packUnit].dim);
+  return next;
+}
 
 function deepClone<T>(v: T): T {
   return JSON.parse(JSON.stringify(v)) as T;
@@ -199,6 +222,41 @@ export const useStore = create<StoreState>()(
 
         removeRow: (id) =>
           set((s) => ({ draft: { ...s.draft, rows: s.draft.rows.filter((r) => r.id !== id) } })),
+
+        addRowsFromInsumos: (insumoIds) => {
+          const { insumos, draft } = get();
+          const fresh: IngredientRow[] = [];
+          for (const id of insumoIds) {
+            const ins = insumos.find((i) => i.id === id);
+            if (!ins) continue;
+            fresh.push({
+              id: newId(),
+              ...insumoFields(ins),
+              used: '',
+              useUnit: baseUnit(UNIT_INFO[ins.unit].dim),
+            });
+          }
+          if (fresh.length === 0) return [];
+          const keep = draft.rows.length === 1 && isBlankRow(draft.rows[0]) ? [] : draft.rows;
+          set({ draft: { ...draft, rows: [...keep, ...fresh] } });
+          return fresh.map((r) => r.id);
+        },
+
+        fillRowFromInsumo: (rowId, insumoId) => {
+          const ins = get().insumos.find((i) => i.id === insumoId);
+          if (!ins) return;
+          set((s) => ({
+            draft: { ...s.draft, rows: s.draft.rows.map((r) => (r.id === rowId ? applyInsumo(r, ins) : r)) },
+          }));
+        },
+
+        syncRowFromInsumo: (rowId) => {
+          const { draft, insumos } = get();
+          const r = draft.rows.find((x) => x.id === rowId);
+          if (!r) return;
+          const ins = linkedInsumo(r, insumos);
+          if (ins && insumoComplete(ins)) get().actions.fillRowFromInsumo(rowId, ins.id);
+        },
 
         resetDraft: () => set({ draft: blankDraft() }),
 

@@ -13,17 +13,21 @@ import { formatMoney, formatNum, formatPct, parseNum } from '../../lib/format';
 import { priceProduct, rowCost } from '../../lib/pricing';
 import { confirmDiscardDraft } from '../../store/draftGuard';
 import { useActions, useStore } from '../../store/store';
+import Notice from '../../components/Notice';
+import { insumoComplete, linkedInsumo, rowOutOfDate } from '../../lib/insumoLink';
 import IngredientRow from './IngredientRow';
+import InsumoPicker, { type PickerMode, type PickerResult } from './InsumoPicker';
 import './CalcularScreen.css';
 
-const HEADERS = ['Ingrediente', 'Presentación', 'Unidad', 'Precio de compra', 'Cantidad usada', 'Unidad', 'Costo', ''];
+const HEADERS = ['Ingrediente', 'Presentación', 'Unidad', 'Precio de compra', 'Cantidad usada', 'Unidad', 'Costo', '', ''];
 
-type FocusTarget = { rowId: string } | 'add' | null;
+type FocusTarget = { rowId: string; field?: 'used' } | 'add' | { element: HTMLElement } | null;
 
 export default function CalcularScreen() {
   const settings = useStore((s) => s.settings);
   const draft = useStore((s) => s.draft);
   const products = useStore((s) => s.products);
+  const insumos = useStore((s) => s.insumos);
   const a = useActions();
   const resultsRef = useRef<HTMLElement | null>(null);
   const listRef = useRef<HTMLUListElement | null>(null);
@@ -31,6 +35,57 @@ export default function CalcularScreen() {
   const [error, setError] = useState('');
   const [announce, setAnnounce] = useState('');
   const [focusTarget, setFocusTarget] = useState<FocusTarget>(null);
+  const [picker, setPicker] = useState<PickerMode | null>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
+
+  // Linked insumo per row id, only for rows whose data differ from the list.
+  const outdated = useMemo(() => {
+    const map = new Map<string, (typeof insumos)[number]>();
+    for (const r of draft.rows) {
+      const ins = linkedInsumo(r, insumos);
+      if (ins && insumoComplete(ins) && rowOutOfDate(r, ins)) map.set(r.id, ins);
+    }
+    return map;
+  }, [draft.rows, insumos]);
+
+  const openPicker = useCallback((mode: PickerMode, opener: HTMLElement) => {
+    openerRef.current = opener;
+    setPicker(mode);
+  }, []);
+
+  const pickForRow = useCallback(
+    (id: string, opener: HTMLElement) => {
+      const row = useStore.getState().draft.rows.find((r) => r.id === id);
+      openPicker({ kind: 'replace', rowId: id, rowLabel: row?.name.trim() || 'este ingrediente' }, opener);
+    },
+    [openPicker],
+  );
+
+  // The button that was clicked unmounts once the row is up to date, so focus goes to the row's "Cantidad usada".
+  const syncRow = useCallback(
+    (id: string) => {
+      const rows = useStore.getState().draft.rows;
+      const i = rows.findIndex((r) => r.id === id);
+      a.syncRowFromInsumo(id);
+      setFocusTarget({ rowId: id, field: 'used' });
+      setAnnounce(`Precio actualizado: ${rows[i]?.name.trim() || `ingrediente ${i + 1}`}.`);
+    },
+    [a],
+  );
+
+  const syncAll = () => {
+    const ids = Array.from(outdated.keys());
+    for (const id of ids) a.syncRowFromInsumo(id);
+    setAnnounce(ids.length === 1 ? '1 ingrediente actualizado.' : `${ids.length} ingredientes actualizados.`);
+    setFocusTarget('add');
+  };
+
+  const closePicker = (r: PickerResult) => {
+    setPicker(null);
+    const rowId = r.addedRowIds[0] ?? r.filledRowId;
+    if (rowId) setFocusTarget({ rowId, field: 'used' });
+    else if (openerRef.current) setFocusTarget({ element: openerRef.current });
+  };
 
   const b = useMemo(() => priceProduct(draft, settings), [draft, settings]);
   const m = settings.moneda;
@@ -47,14 +102,17 @@ export default function CalcularScreen() {
     if (!focusTarget) return;
     if (focusTarget === 'add') {
       addRef.current?.querySelector('button')?.focus();
+    } else if ('element' in focusTarget) {
+      focusTarget.element.focus();
     } else {
       const li = Array.from(listRef.current?.querySelectorAll<HTMLElement>('[data-row-id]') ?? []).find(
         (el) => el.dataset.rowId === focusTarget.rowId,
       );
-      const input = li?.querySelector('input');
+      const input = li?.querySelector<HTMLInputElement>(focusTarget.field === 'used' ? '.ing-row__used input' : 'input');
       if (input) {
         input.focus();
-        input.scrollIntoView?.({ block: 'center' });
+        const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        input.scrollIntoView?.({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
       }
     }
     setFocusTarget(null);
@@ -149,6 +207,20 @@ export default function CalcularScreen() {
                 <p className="calc__muted">Todavía no hay ingredientes. Agrega el primero.</p>
               ) : (
                 <>
+                  {outdated.size > 0 ? (
+                    <Notice
+                      tone="info"
+                      action={
+                        <Button onClick={syncAll}>
+                          Actualizar todos
+                        </Button>
+                      }
+                    >
+                      {outdated.size === 1
+                        ? '1 ingrediente tiene otro precio en tu lista de insumos.'
+                        : `${outdated.size} ingredientes tienen otro precio en tu lista de insumos.`}
+                    </Notice>
+                  ) : null}
                   <div className="ing-head" aria-hidden="true">
                     {HEADERS.map((h, i) => (
                       <span key={i}>{h}</span>
@@ -156,7 +228,11 @@ export default function CalcularScreen() {
                   </div>
                   <ul className="calc__list" ref={listRef}>
                     {draft.rows.map((r, i) => (
-                      <IngredientRow key={r.id} row={r} index={i} moneda={m} onRemove={removeIngredient} />
+                      <IngredientRow key={r.id} row={r} index={i} moneda={m} onRemove={removeIngredient}
+                        onPick={pickForRow}
+                        outdatedInsumo={outdated.get(r.id) ?? null}
+                        onSync={syncRow}
+                      />
                     ))}
                   </ul>
                 </>
@@ -165,9 +241,12 @@ export default function CalcularScreen() {
                 <p className="calc__small">Revisa las unidades marcadas: no se puede convertir entre peso, volumen y piezas.</p>
               ) : null}
               <div className="calc__listfoot">
-                <div ref={addRef}>
+                <div ref={addRef} className="calc__adds">
                   <Button icon="plus" onClick={addIngredient}>
                     Agregar ingrediente
+                  </Button>
+                  <Button variant="primary" icon="list" onClick={(e) => openPicker({ kind: 'add' }, e.currentTarget)}>
+                    Agregar desde mis insumos
                   </Button>
                 </div>
                 <div className="calc__total calc__total--inline">
@@ -389,6 +468,8 @@ export default function CalcularScreen() {
           </section>
         </aside>
       </div>
+
+      <InsumoPicker mode={picker} onClose={closePicker} />
 
       <div className="calc__bar">
         <div className="calc__bar-price">

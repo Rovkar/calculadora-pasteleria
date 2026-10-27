@@ -11,6 +11,8 @@ export interface IngredientRow {
   price: string;
   used: string;
   useUnit: Unit;
+  /** Insumo this row was filled from (optional link; the row keeps its own copy of the data). */
+  insumoId?: string;
 }
 
 export interface ProductInput {

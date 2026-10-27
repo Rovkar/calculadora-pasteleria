@@ -90,19 +90,35 @@ function sample(
   return { id, name, porciones, horas, gasHoras, luzKwh, aguaLitros, rows, sample: true, updatedAt: Date.now() };
 }
 
+/** Stable id of a bundled insumo, so the sample recipe rows can point to it. */
+function seedInsumoId(name: string): string {
+  return `seed-insumo-${name.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+}
+
+function linkedRow(
+  name: string,
+  pack: string,
+  packUnit: Unit,
+  price: string,
+  used: string,
+  useUnit: Unit,
+): IngredientRow {
+  return { ...row(name, pack, packUnit, price, used, useUnit), insumoId: seedInsumoId(name) };
+}
+
 export function createSeedProducts(): Product[] {
   return [
     sample(SEED_PASTEL_ID, 'Pastel de chocolate', '12', '2.5', '1', '1.2', '20', [
-      row('Harina de trigo', '1', 'kg', '32', '300', 'g'),
-      row('Azúcar', '1', 'kg', '34', '350', 'g'),
-      row('Cocoa en polvo', '250', 'g', '68', '80', 'g'),
-      row('Huevo', '30', 'pza', '95', '4', 'pza'),
-      row('Mantequilla', '450', 'g', '98', '150', 'g'),
-      row('Leche entera', '1', 'gal', '106', '250', 'ml'),
-      row('Polvo para hornear', '220', 'g', '32', '10', 'g'),
-      row('Chocolate semiamargo', '1', 'kg', '260', '200', 'g'),
-      row('Crema para batir', '1', 'l', '95', '200', 'ml'),
-      row('Caja y base para pastel', '1', 'pza', '25', '1', 'pza'),
+      linkedRow('Harina de trigo', '1', 'kg', '32', '300', 'g'),
+      linkedRow('Azúcar', '1', 'kg', '34', '350', 'g'),
+      linkedRow('Cocoa en polvo', '250', 'g', '68', '80', 'g'),
+      linkedRow('Huevo', '30', 'pza', '95', '4', 'pza'),
+      linkedRow('Mantequilla', '450', 'g', '98', '150', 'g'),
+      linkedRow('Leche entera', '1', 'gal', '106', '250', 'ml'),
+      linkedRow('Polvo para hornear', '220', 'g', '32', '10', 'g'),
+      linkedRow('Chocolate semiamargo', '1', 'kg', '260', '200', 'g'),
+      linkedRow('Crema para batir', '1', 'l', '95', '200', 'ml'),
+      linkedRow('Caja y base para pastel', '1', 'pza', '25', '1', 'pza'),
     ]),
     sample('seed-cheesecake-de-fresa', 'Cheesecake de fresa', '10', '2', '1.25', '1', '15', totalRow('228.50')),
     sample('seed-pay-de-limon', 'Pay de limón', '8', '1.25', '0.25', '0.6', '10', totalRow('96.80')),
@@ -129,7 +145,7 @@ export function createSeedInsumos(): Insumo[] {
     ['Leche condensada', '387', 'g', '34'],
     ['Vainilla', '250', 'ml', '45'],
   ];
-  return list.map(([name, pack, unit, price]) => ({ id: newId(), name, pack, unit, price }));
+  return list.map(([name, pack, unit, price]) => ({ id: seedInsumoId(name), name, pack, unit, price }));
 }
 
 /** Deep copy of a product's input fields (fresh row ids are NOT generated: ids are kept). */

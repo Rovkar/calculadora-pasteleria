@@ -132,8 +132,8 @@ export default function InsumosScreen() {
         <div className="insumos__eyebrow">Insumos</div>
         <h1>Lista de insumos</h1>
         <p>
-          Tu lista de precios de referencia: registra lo que pagas por cada ingrediente, en g, kg, ml, l, galones o piezas.
-          El costo por gramo, mililitro o pieza se calcula solo, para que compares y revises tus precios.
+          Registra lo que pagas por cada ingrediente, en g, kg, ml, l, galones o piezas. El costo por gramo, mililitro o
+          pieza se calcula solo, y desde la calculadora puedes elegir estos insumos para llenar tus recetas.
         </p>
       </div>
 
@@ -209,14 +209,13 @@ export default function InsumosScreen() {
         <Card title="Cómo se usa" headingLevel={2}>
           <p>
             Anota la presentación tal como la compras (por ejemplo, 1 kg de harina por $32 o 1 galón de leche por $106).
-            Esta lista es de consulta: en la calculadora cada ingrediente lleva su propia presentación y precio, así que ahí
-            escribes los mismos datos y cuánto usaste.
+            En la calculadora toca «Agregar desde mis insumos» y solo escribe cuánto usaste.
           </p>
         </Card>
         <Card title="Mantén tus precios al día" headingLevel={2}>
           <p>
-            Cuando cambie el precio de un insumo, actualízalo aquí y también en los ingredientes de tus productos para no
-            perder ganancia. Los productos no se actualizan solos al cambiar esta lista.
+            Cuando cambie un precio, actualízalo aquí. Al abrir una receta que usa ese insumo, la calculadora te avisará
+            para que actualices su precio.
           </p>
           <a className="insumos__link" href={hrefFor('calcular')}>
             Ir a la calculadora

@@ -89,7 +89,7 @@ function cleanQuick(raw: unknown): QuickCalc {
 
 function cleanRow(raw: unknown): IngredientRow | null {
   if (!isRec(raw)) return null;
-  return {
+  const out: IngredientRow = {
     id: str(raw.id, '') || newId(),
     name: str(raw.name, ''),
     pack: str(raw.pack, ''),
@@ -98,6 +98,8 @@ function cleanRow(raw: unknown): IngredientRow | null {
     used: str(raw.used, ''),
     useUnit: unit(raw.useUnit, 'g'),
   };
+  if (typeof raw.insumoId === 'string' && raw.insumoId !== '' && raw.insumoId.length <= 100) out.insumoId = raw.insumoId;
+  return out;
 }
 
 function cleanRows(raw: unknown): IngredientRow[] {

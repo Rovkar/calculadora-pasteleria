@@ -11,7 +11,7 @@ function signature(i: ProductInput): string {
     i.gasHoras,
     i.luzKwh,
     i.aguaLitros,
-    i.rows.map((r) => [r.name, r.pack, r.packUnit, r.price, r.used, r.useUnit]),
+    i.rows.map((r) => [r.name, r.pack, r.packUnit, r.price, r.used, r.useUnit, r.insumoId ?? '']),
   ]);
 }
 

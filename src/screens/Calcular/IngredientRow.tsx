@@ -3,10 +3,10 @@ import Button from '../../components/Button';
 import NumberField from '../../components/NumberField';
 import Select from '../../components/Select';
 import TextField from '../../components/TextField';
-import { formatMoney } from '../../lib/format';
+import { formatMoney, parseNum } from '../../lib/format';
 import { rowCost } from '../../lib/pricing';
-import { UNITS } from '../../lib/units';
-import type { IngredientRow as Row } from '../../store/types';
+import { UNITS, UNIT_INFO } from '../../lib/units';
+import type { IngredientRow as Row, Insumo } from '../../store/types';
 import { useActions } from '../../store/store';
 import './IngredientRow.css';
 
@@ -18,6 +18,11 @@ interface Props {
   moneda: string;
   /** Stable callback: the parent decides where focus goes afterwards. */
   onRemove: (id: string) => void;
+  /** Opens the insumo picker in replace mode for this row; `opener` gets the focus back if nothing is chosen. */
+  onPick: (id: string, opener: HTMLElement) => void;
+  /** Linked insumo whose pack, unit or price differ from the row (null when the row is up to date or unlinked). */
+  outdatedInsumo: Insumo | null;
+  onSync: (id: string) => void;
 }
 
 /**
@@ -25,7 +30,7 @@ interface Props {
  * In the table the visible column header replaces the label, so every label is also unique per row for screen readers:
  * the row name goes in a visually hidden suffix.
  */
-function IngredientRow({ row, index, moneda, onRemove }: Props) {
+function IngredientRow({ row, index, moneda, onRemove, onPick, outdatedInsumo, onSync }: Props) {
   const { updateRow } = useActions();
   const { cost, incompatible } = rowCost(row);
   const label = row.name.trim() || `ingrediente ${index + 1}`;
@@ -82,9 +87,30 @@ function IngredientRow({ row, index, moneda, onRemove }: Props) {
         <span className="ing-row__cost-label">Costo</span>
         <span className="num">{incompatible ? 'No compatibles' : formatMoney(cost, moneda)}</span>
       </div>
+      <div className="ing-row__pick">
+        <Button
+          className="ing-row__pickbtn"
+          icon="list"
+          onClick={(e) => onPick(row.id, e.currentTarget)}
+        >
+          <span className="ing-row__picktext">Elegir de la lista</span>
+          <span className="visually-hidden"> para {label}</span>
+        </Button>
+      </div>
       <div className="ing-row__remove">
         <Button variant="icon" icon="trash" aria-label={`Quitar ${label}`} onClick={() => onRemove(row.id)} />
       </div>
+      {outdatedInsumo ? (
+        <div className="ing-row__note">
+          <span className="ing-row__note-text">
+            En tu lista: {outdatedInsumo.pack} {UNIT_INFO[outdatedInsumo.unit].label} a{' '}
+            {formatMoney(parseNum(outdatedInsumo.price), moneda)}
+          </span>
+          <Button variant="ghost" onClick={() => onSync(row.id)}>
+            Usar este precio<span className="visually-hidden"> en {label}</span>
+          </Button>
+        </div>
+      ) : null}
     </li>
   );
 }
