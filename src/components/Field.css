@@ -1,0 +1,113 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.field__control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--control-height);
+  padding: 0 12px;
+  background: var(--surface);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-control);
+}
+
+.field__control:focus-within {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.field__control--error {
+  border-color: var(--error);
+}
+
+.field__control--disabled {
+  background: var(--soft);
+  opacity: 0.7;
+}
+
+.field__input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: calc(var(--control-height) - 2px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 16px;
+  color: var(--ink);
+}
+
+.field__input:focus,
+.field__input:focus-visible {
+  outline: none;
+}
+
+.field__input::placeholder {
+  color: var(--muted);
+  opacity: 0.75;
+}
+
+.field__affix {
+  flex: none;
+  color: var(--muted);
+}
+
+.field--lg .field__control {
+  min-height: 52px;
+}
+.field--lg .field__input {
+  min-height: 50px;
+  font-size: 18px;
+}
+
+.field__helper {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.field__error {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--error);
+}
+
+/* Select */
+.field__select-wrap {
+  position: relative;
+}
+
+.field__select {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: 0 36px 0 12px;
+  background-color: var(--surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236A5B54' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-control);
+  font-size: 16px;
+  color: var(--ink);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.field__select--error {
+  border-color: var(--error);
+}
+
+.field--lg .field__select {
+  min-height: 52px;
+  font-size: 18px;
+}

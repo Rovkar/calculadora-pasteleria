@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Lista de insumos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#F4F1EC;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#2A1F1B}
+a:hover{color:#B0245A}
+input,select,button{font-family:inherit;font-size:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #2A1F1B;outline-offset:2px}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+</style>
+</helmet>
+<div style="width: 100%; background: #F4F1EC; color: #2A1F1B; font-family: 'DM Sans', system-ui, sans-serif; font-size: 16px; line-height: 1.5; min-height: 1280px">
+  <header style="background: #FFFFFF; border-bottom: 1px solid #E4DDD5">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 10px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px">
+      <a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; color: #2A1F1B">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"></path><path d="M5 20v-7h14v7"></path><path d="M5 16c1.6 1 3 1 4.6 0s3.2-1 4.8 0 3 1 4.6 0"></path><path d="M12 13V9"></path><path d="M12 6.6c.8 0 1.3-.6 1.3-1.3 0-.9-1.3-2.3-1.3-2.3s-1.3 1.4-1.3 2.3c0 .7.5 1.3 1.3 1.3z"></path></svg>
+        <span style="display: flex; flex-direction: column; line-height: 1.15"><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 700; font-size: 18px">Calculadora de precios</span><span style="font-size: 13px; color: #6A5B54">Pasteles y postres</span></span>
+      </a>
+      <nav aria-label="Secciones" style="display: flex; flex-wrap: wrap; gap: 4px">
+        <a href="Main.dc.html" style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 10px; text-decoration: none; font-weight: 500; color: #2A1F1B">Calculadora</a>
+        <a href="Insumos.dc.html" aria-current="page" style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 10px; text-decoration: none; font-weight: 600; color: #FFFFFF; background: {{ acento }}">Insumos</a>
+        <a href="Main.dc.html" style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 10px; text-decoration: none; font-weight: 500; color: #2A1F1B">Mis productos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main style="max-width: 1200px; margin: 0 auto; padding: 32px 24px 56px">
+    <div style="margin-bottom: 24px">
+      <div style="font-size: 13px; font-weight: 600; color: #6A5B54; letter-spacing: 0.02em">Insumos</div>
+      <h1 style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 700; font-size: 36px; line-height: 1.1; letter-spacing: -0.01em; margin: 4px 0 8px">Lista de insumos</h1>
+      <p style="margin: 0; max-width: 680px; font-size: 14px; color: #6A5B54">Registra lo que pagas por cada ingrediente, en g, kg, ml, l, galones o piezas. El costo por gramo, mililitro o pieza se calcula solo, para que tus recetas usen precios al día.</p>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between; margin-bottom: 16px">
+      <div style="flex: 1 1 260px; max-width: 360px; min-width: 0">
+        <label for="buscar-insumo" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px">Buscar insumo</label>
+        <div style="position: relative">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6A5B54" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position: absolute; left: 12px; top: 12px; pointer-events: none"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          <input id="buscar-insumo" type="search" placeholder="Ej. harina" value="{{ query }}" onChange="{{ onQuery }}" style="width: 100%; height: 44px; padding: 0 12px 0 40px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-size: 16px" />
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px">
+        <span style="font-size: 14px; color: #6A5B54" aria-live="polite">{{ countText }}</span>
+        <button type="button" onClick="{{ addRow }}" style="display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border: none; border-radius: 10px; background: {{ acento }}; color: #FFFFFF; font-weight: 600; cursor: pointer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+          Agregar insumo
+        </button>
+      </div>
+    </div>
+
+    <div style="background: #FFFFFF; border: 1px solid #E4DDD5; border-radius: 16px; padding: 0; overflow: hidden; box-shadow: 0 1px 2px rgba(42,31,27,0.06)">
+      <div style="overflow-x: auto">
+        <div style="min-width: 860px">
+          <div style="display: grid; grid-template-columns: minmax(200px, 2.4fr) minmax(100px, 1fr) 92px minmax(120px, 1.2fr) minmax(120px, 1.2fr) minmax(130px, 1.2fr) 44px; gap: 10px; align-items: center; background: #F7F3EE; padding: 12px 20px; font-size: 13px; font-weight: 600; color: #6A5B54">
+            <div>Insumo</div>
+            <div>Presentación</div>
+            <div>Unidad</div>
+            <div>Precio de compra</div>
+            <div style="text-align: right">Costo por unidad</div>
+            <div style="text-align: right">Costo por kg / l</div>
+            <div></div>
+          </div>
+          <sc-for list="{{ visibleRows }}" as="row" hint-placeholder-count="8">
+            <div style="display: grid; grid-template-columns: minmax(200px, 2.4fr) minmax(100px, 1fr) 92px minmax(120px, 1.2fr) minmax(120px, 1.2fr) minmax(130px, 1.2fr) 44px; gap: 10px; align-items: center; padding: 8px 20px; border-top: 1px solid #E4DDD5">
+              <input type="text" aria-label="Nombre del insumo" placeholder="Nombre" value="{{ row.name }}" onChange="{{ row.onName }}" style="width: 100%; min-width: 0; height: 44px; padding: 0 12px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-size: 16px" />
+              <input type="number" min="0" step="any" aria-label="Presentación de {{ row.label }}" placeholder="0" value="{{ row.pack }}" onChange="{{ row.onPack }}" style="width: 100%; min-width: 0; height: 44px; padding: 0 12px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+              <select aria-label="Unidad de {{ row.label }}" value="{{ row.unit }}" onChange="{{ row.onUnit }}" style="width: 100%; min-width: 0; height: 44px; padding: 0 8px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-size: 16px">
+                <option value="g">g</option>
+                <option value="kg">kg</option>
+                <option value="ml">ml</option>
+                <option value="l">l</option>
+                <option value="gal">gal</option>
+                <option value="pza">pza</option>
+              </select>
+              <div style="display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 12px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF">
+                <span style="color: #6A5B54" aria-hidden="true">{{ row.moneda }}</span>
+                <input type="number" min="0" step="any" aria-label="Precio de compra de {{ row.label }}" placeholder="0.00" value="{{ row.price }}" onChange="{{ row.onPrice }}" style="flex: 1 1 auto; width: 100%; min-width: 0; height: 40px; padding: 0; border: none; background: transparent; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+              </div>
+              <div style="text-align: right; font-variant-numeric: tabular-nums">{{ row.unitCost }}</div>
+              <div style="text-align: right; font-variant-numeric: tabular-nums; color: {{ row.kgColor }}">{{ row.kgCost }}</div>
+              <button type="button" aria-label="Eliminar {{ row.label }}" onClick="{{ row.remove }}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: none; border-radius: 10px; background: transparent; color: #6A5B54; cursor: pointer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"></path><path d="M9 7V4h6v3"></path><path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>
+              </button>
+            </div>
+          </sc-for>
+          <sc-if value="{{ noMatches }}" hint-placeholder-val="{{ false }}">
+            <div style="border-top: 1px solid #E4DDD5; padding: 32px 20px; text-align: center; color: #6A5B54">No hay insumos que coincidan con «{{ query }}».</div>
+          </sc-if>
+          <sc-if value="{{ isEmptyList }}" hint-placeholder-val="{{ false }}">
+            <div style="border-top: 1px solid #E4DDD5; padding: 32px 20px; text-align: center; color: #6A5B54">Tu lista está vacía. Agrega tu primer insumo.</div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; margin-top: 24px">
+      <section style="flex: 1 1 300px; min-width: 0; background: #F7F3EE; border-radius: 16px; padding: 20px 24px">
+        <h2 style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 600; font-size: 20px; line-height: 1.25; letter-spacing: -0.01em; margin: 0 0 8px">Cómo se usa</h2>
+        <p style="margin: 0; font-size: 14px; color: #6A5B54">Anota la presentación tal como la compras (por ejemplo, 1 kg de harina por $32 o 1 galón de leche por $106). En la calculadora solo escribes cuánto usaste.</p>
+      </section>
+      <section style="flex: 1 1 300px; min-width: 0; background: #F7F3EE; border-radius: 16px; padding: 20px 24px">
+        <h2 style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 600; font-size: 20px; line-height: 1.25; letter-spacing: -0.01em; margin: 0 0 8px">Mantén tus precios al día</h2>
+        <p style="margin: 0 0 8px; font-size: 14px; color: #6A5B54">Cuando cambie el precio de un insumo, actualízalo aquí y recalcula tus productos para no perder ganancia.</p>
+        <a href="Main.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-decoration: underline; color: {{ acento }}">Ir a la calculadora</a>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"moneda":{"editor":"enum","options":["$","€","S/","Q","₡","Bs"],"default":"$","section":"Estilo"},"acento":{"editor":"color","options":["#B0245A","#8A4B2A","#2F6B5E","#3B4FA0"],"default":"#B0245A","section":"Estilo"},"$preview":{"width":1280,"height":1280}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const seed = [
+      ['Harina de trigo', '1', 'kg', '32'],
+      ['Azúcar', '1', 'kg', '34'],
+      ['Cocoa en polvo', '250', 'g', '68'],
+      ['Huevo', '30', 'pza', '95'],
+      ['Mantequilla', '450', 'g', '98'],
+      ['Leche entera', '1', 'gal', '106'],
+      ['Polvo para hornear', '220', 'g', '32'],
+      ['Chocolate semiamargo', '1', 'kg', '260'],
+      ['Crema para batir', '1', 'l', '95'],
+      ['Caja y base para pastel', '1', 'pza', '25'],
+      ['Queso crema', '190', 'g', '38'],
+      ['Fresa', '1', 'kg', '70'],
+      ['Limón', '1', 'kg', '40'],
+      ['Leche condensada', '387', 'g', '34'],
+      ['Vainilla', '250', 'ml', '45']
+    ];
+    this.state = {
+      rows: seed.map((s, i) => ({ id: i + 1, name: s[0], pack: s[1], unit: s[2], price: s[3] })),
+      nextId: 16,
+      query: ''
+    };
+  }
+
+  num(v) {
+    const n = parseFloat(String(v).replace(',', '.'));
+    return isFinite(n) ? n : 0;
+  }
+
+  norm(s) {
+    return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  }
+
+  fmt(n, d) {
+    return new Intl.NumberFormat('es-MX', { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
+  }
+
+  updateRow(id, key, value) {
+    this.setState({ rows: this.state.rows.map((r) => (r.id === id ? Object.assign({}, r, { [key]: value }) : r)) });
+  }
+
+  removeRow(id) {
+    this.setState({ rows: this.state.rows.filter((r) => r.id !== id) });
+  }
+
+  renderVals() {
+    const moneda = this.props.moneda ?? '$';
+    const acento = this.props.acento ?? '#B0245A';
+    const { rows, query } = this.state;
+    const q = this.norm(query.trim());
+    const filtered = q ? rows.filter((r) => this.norm(r.name).indexOf(q) !== -1) : rows;
+
+    const visibleRows = filtered.map((r) => {
+      const pack = this.num(r.pack);
+      const price = this.num(r.price);
+      let unitCost = '—';
+      let kgCost = '—';
+      let kgColor = '#2A1F1B';
+      const factors = { g: 1, kg: 1000, ml: 1, l: 1000, gal: 3785.41, pza: 1 };
+      if (pack > 0) {
+        const per = price / (pack * factors[r.unit]);
+        if (r.unit === 'pza') {
+          unitCost = moneda + this.fmt(per, 2) + ' / pza';
+        } else if (r.unit === 'g' || r.unit === 'kg') {
+          unitCost = moneda + this.fmt(per, 3) + ' / g';
+          kgCost = moneda + this.fmt(per * 1000, 2) + ' / kg';
+        } else {
+          unitCost = moneda + this.fmt(per, 3) + ' / ml';
+          kgCost = moneda + this.fmt(per * 1000, 2) + ' / l';
+        }
+      }
+      if (kgCost === '—') kgColor = '#6A5B54';
+      return Object.assign({}, r, {
+        label: r.name.trim() ? r.name.trim() : 'insumo sin nombre',
+        moneda: moneda,
+        unitCost: unitCost,
+        kgCost: kgCost,
+        kgColor: kgColor,
+        onName: (e) => this.updateRow(r.id, 'name', e.target.value),
+        onPack: (e) => this.updateRow(r.id, 'pack', e.target.value),
+        onUnit: (e) => this.updateRow(r.id, 'unit', e.target.value),
+        onPrice: (e) => this.updateRow(r.id, 'price', e.target.value),
+        remove: () => this.removeRow(r.id)
+      });
+    });
+
+    const total = rows.length;
+    let countText;
+    if (q && filtered.length !== total) {
+      countText = filtered.length + ' de ' + total + (total === 1 ? ' insumo' : ' insumos');
+    } else {
+      countText = total + (total === 1 ? ' insumo' : ' insumos');
+    }
+
+    return {
+      moneda: moneda,
+      acento: acento,
+      query: query,
+      visibleRows: visibleRows,
+      countText: countText,
+      isEmptyList: total === 0,
+      noMatches: total > 0 && filtered.length === 0,
+      onQuery: (e) => this.setState({ query: e.target.value }),
+      addRow: () => {
+        const id = this.state.nextId;
+        this.setState({
+          rows: [{ id: id, name: '', pack: '', unit: 'g', price: '' }].concat(this.state.rows),
+          nextId: id + 1,
+          query: ''
+        });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

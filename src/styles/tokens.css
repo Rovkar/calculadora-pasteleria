@@ -1,0 +1,51 @@
+:root {
+  --bg: #f4f1ec;
+  --surface: #ffffff;
+  --border: #e4ddd5;
+  --input-border: #cfc4b9;
+  --soft: #f7f3ee;
+  --ink: #2a1f1b;
+  --muted: #6a5b54;
+  --accent: #b0245a;
+  --on-accent: #ffffff;
+  --error: #8a2a1f;
+
+  --c-mp: #5b3a2e;
+  --c-mo: #c58a3d;
+  --c-gi: #e2d3c1;
+  --c-gi-border: #cfc4b9;
+  --c-ganancia: var(--accent);
+  --c-iva: #8f9aa5;
+
+  --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --font-body: 'DM Sans Variable', system-ui, sans-serif;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-14: 56px;
+
+  --radius-card: 16px;
+  --radius-control: 10px;
+  --radius-segmented: 12px;
+  --control-height: 44px;
+  --shadow-soft: 0 1px 2px rgba(42, 31, 27, 0.06);
+
+  --bottom-nav-height: 0px;
+  /* Height of the sticky header. AppShell overwrites it with the measured value (the tabs can wrap on some widths). */
+  --header-h: 69px;
+}
+
+@media (max-width: 899px) {
+  :root {
+    --control-height: 48px;
+    --header-h: 52px;
+    /* Real value is set by AppShell; this keeps screens safe before it mounts. */
+    --bottom-nav-height: calc(60px + env(safe-area-inset-bottom, 0px));
+  }
+}

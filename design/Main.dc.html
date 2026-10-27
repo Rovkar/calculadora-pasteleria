@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Calculadora y productos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#F4F1EC;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#2A1F1B}
+a:hover{color:#B0245A}
+input,select,button{font:inherit;color:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #2A1F1B;outline-offset:2px}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+</style>
+</helmet>
+<div style="width: 100%; background: #F4F1EC; color: #2A1F1B; font-family: 'DM Sans', system-ui, sans-serif; font-size: 16px; line-height: 1.5">
+  <header style="background: #FFFFFF; border-bottom: 1px solid #E4DDD5">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 10px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px">
+      <button type="button" onClick="{{ irCalculadora }}" style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; color: #2A1F1B">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"></path><path d="M5 20v-7h14v7"></path><path d="M5 16c1.6 1 3 1 4.6 0s3.2-1 4.8 0 3 1 4.6 0"></path><path d="M12 13V9"></path><path d="M12 6.6c.8 0 1.3-.6 1.3-1.3 0-.9-1.3-2.3-1.3-2.3s-1.3 1.4-1.3 2.3c0 .7.5 1.3 1.3 1.3z"></path></svg>
+        <span style="display: flex; flex-direction: column; line-height: 1.15"><span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 700; font-size: 18px">Calculadora de precios</span><span style="font-size: 13px; color: #6A5B54">Pasteles y postres</span></span>
+      </button>
+      <nav aria-label="Secciones" style="display: flex; flex-wrap: wrap; gap: 4px">
+        <button type="button" aria-current="{{ calcCurrent }}" onClick="{{ irCalculadora }}" style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border: 0; border-radius: 10px; cursor: pointer; font-weight: {{ calcWeight }}; color: {{ calcFg }}; background: {{ calcBg }}">Calculadora</button>
+        <a href="Insumos.dc.html" style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 10px; text-decoration: none; font-weight: 500; color: #2A1F1B">Insumos</a>
+        <button type="button" aria-current="{{ productosCurrent }}" onClick="{{ irProductos }}" style="display: flex; align-items: center; min-height: 44px; padding: 0 16px; border: 0; border-radius: 10px; cursor: pointer; font-weight: {{ productosWeight }}; color: {{ productosFg }}; background: {{ productosBg }}">Mis productos</button>
+      </nav>
+    </div>
+  </header>
+
+  <sc-if value="{{ showCalc }}" hint-placeholder-val="{{ true }}">
+  <main style="max-width: 1200px; margin: 0 auto; padding: 32px 24px 56px">
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px">
+      <span style="font-size: 13px; font-weight: 600; color: #6A5B54; letter-spacing: 0.02em">Calculadora</span>
+      <h1 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 700; font-size: 36px; line-height: 1.1; letter-spacing: -0.01em">Calcula tu precio de venta</h1>
+      <p style="margin: 0; max-width: 680px; color: #6A5B54">Suma tus ingredientes, tu tiempo y la ganancia que quieres. Los valores de ejemplo son de un pastel de chocolate: cámbialos por los tuyos.</p>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+      <div style="flex: 999 1 620px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+
+        <section style="background: #FFFFFF; border: 1px solid #E4DDD5; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+          <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 600; font-size: 20px; line-height: 1.25; letter-spacing: -0.01em">Producto</h2>
+          <div style="display: flex; flex-wrap: wrap; gap: 16px">
+            <div style="flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <label for="producto-nombre" style="font-size: 14px; font-weight: 600">Nombre del producto</label>
+              <input id="producto-nombre" type="text" value="{{ nombre }}" onChange="{{ onNombre }}" style="width: 100%; min-width: 0; height: 44px; padding: 0 12px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-size: 16px" />
+            </div>
+            <div style="flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <label for="producto-porciones" style="font-size: 14px; font-weight: 600">Rinde (porciones)</label>
+              <input id="producto-porciones" type="number" min="1" value="{{ porciones }}" onChange="{{ onPorciones }}" style="width: 100%; min-width: 0; height: 44px; padding: 0 12px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+            </div>
+          </div>
+        </section>
+
+        <section style="background: #FFFFFF; border: 1px solid #E4DDD5; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+          <div style="display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 8px 16px">
+            <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+              <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 600; font-size: 20px; line-height: 1.25; letter-spacing: -0.01em">Materia prima</h2>
+              <span style="font-size: 14px; color: #6A5B54">Precio que pagas por el paquete y lo que usas en la receta. Puedes usar g, kg, ml, l, galones o piezas: se convierten solos.</span>
+            </div>
+            <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 700; font-size: 20px; font-variant-numeric: tabular-nums">{{ mpTexto }}</span>
+          </div>
+
+          <div style="overflow-x: auto; border: 1px solid #E4DDD5; border-radius: 12px">
+            <div style="min-width: 940px">
+              <div style="display: grid; grid-template-columns: minmax(170px, 2fr) minmax(180px, 1.6fr) minmax(120px, 1.1fr) minmax(180px, 1.6fr) minmax(110px, 1fr) 44px; gap: 8px; align-items: center; padding: 10px 12px; background: #F7F3EE; font-size: 13px; font-weight: 600; color: #6A5B54">
+                <span>Ingrediente</span><span>Presentación</span><span>Precio de compra</span><span>Cantidad usada</span><span style="text-align: right">Costo</span><span></span>
+              </div>
+              <sc-for list="{{ rows }}" as="row" hint-placeholder-count="6">
+                <div style="display: grid; grid-template-columns: minmax(170px, 2fr) minmax(180px, 1.6fr) minmax(120px, 1.1fr) minmax(180px, 1.6fr) minmax(110px, 1fr) 44px; gap: 8px; align-items: center; padding: 8px 12px; border-top: 1px solid #E4DDD5">
+                  <input type="text" aria-label="Ingrediente {{ row.num }}" value="{{ row.name }}" onChange="{{ row.onName }}" style="width: 100%; min-width: 0; height: 44px; padding: 0 12px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-size: 16px" />
+                  <div style="display: flex; gap: 6px; min-width: 0">
+                    <input type="number" min="0" aria-label="Presentación del ingrediente {{ row.num }}" value="{{ row.pack }}" onChange="{{ row.onPack }}" style="flex: 1; width: 100%; min-width: 0; height: 44px; padding: 0 12px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+                    <select aria-label="Unidad de compra {{ row.num }}" value="{{ row.packUnit }}" onChange="{{ row.onPackUnit }}" style="width: 80px; flex: none; height: 44px; padding: 0 6px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-size: 16px">
+                      <option value="g">g</option><option value="kg">kg</option><option value="ml">ml</option><option value="l">l</option><option value="gal">gal</option><option value="pza">pza</option>
+                    </select>
+                  </div>
+                  <div style="display: flex; align-items: center; height: 44px; padding: 0 0 0 12px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; min-width: 0">
+                    <span style="color: #6A5B54; font-size: 14px; padding-right: 4px">{{ moneda }}</span>
+                    <input type="number" min="0" aria-label="Precio de compra del ingrediente {{ row.num }}" value="{{ row.price }}" onChange="{{ row.onPrice }}" style="flex: 1; width: 100%; min-width: 0; height: 40px; padding: 0 8px 0 0; border: 0; background: transparent; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+                  </div>
+                  <div style="display: flex; gap: 6px; min-width: 0">
+                    <input type="number" min="0" aria-label="Cantidad usada del ingrediente {{ row.num }}" value="{{ row.used }}" onChange="{{ row.onUsed }}" style="flex: 1; width: 100%; min-width: 0; height: 44px; padding: 0 12px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+                    <select aria-label="Unidad de uso {{ row.num }}" value="{{ row.useUnit }}" onChange="{{ row.onUseUnit }}" style="width: 80px; flex: none; height: 44px; padding: 0 6px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-size: 16px">
+                      <option value="g">g</option><option value="kg">kg</option><option value="ml">ml</option><option value="l">l</option><option value="gal">gal</option><option value="pza">pza</option>
+                    </select>
+                  </div>
+                  <span style="text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; font-size: {{ row.costSize }}; color: {{ row.costColor }}">{{ row.costTexto }}</span>
+                  <button type="button" aria-label="Quitar ingrediente {{ row.num }}" onClick="{{ row.remove }}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 10px; background: transparent; color: #6A5B54; cursor: pointer">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M6 7l1 12h10l1-12"></path><path d="M9 7V4h6v3"></path></svg>
+                  </button>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}">
+            <p style="margin: 0; color: #6A5B54">Todavía no hay ingredientes. Agrega el primero.</p>
+          </sc-if>
+
+          <sc-if value="{{ hasUnitIssues }}" hint-placeholder-val="{{ false }}">
+            <p style="margin: 0; font-size: 14px; color: #6A5B54">Revisa las unidades marcadas: no se puede convertir entre peso, volumen y piezas.</p>
+          </sc-if>
+
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px">
+            <button type="button" onClick="{{ addRow }}" style="height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-weight: 600; cursor: pointer">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+              Agregar ingrediente
+            </button>
+            <div style="display: flex; align-items: baseline; gap: 16px">
+              <span style="font-weight: 600">Total materia prima</span>
+              <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums">{{ mpTexto }}</span>
+            </div>
+          </div>
+        </section>
+
+        <section style="background: #FFFFFF; border: 1px solid #E4DDD5; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+          <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 600; font-size: 20px; line-height: 1.25; letter-spacing: -0.01em">Mano de obra</h2>
+          <div style="display: flex; flex-wrap: wrap; gap: 16px">
+            <div style="flex: 1 1 120px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <label for="mo-horas" style="font-size: 14px; font-weight: 600">Horas de trabajo</label>
+              <input id="mo-horas" type="number" min="0" step="0.25" value="{{ horas }}" onChange="{{ onHoras }}" style="width: 100%; min-width: 0; height: 44px; padding: 0 12px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+            </div>
+            <div style="flex: 1 1 120px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <label for="mo-tarifa" style="font-size: 14px; font-weight: 600">Tarifa por hora</label>
+              <div style="display: flex; align-items: center; height: 44px; padding: 0 0 0 12px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; min-width: 0">
+                <span style="color: #6A5B54; font-size: 14px; padding-right: 4px">{{ moneda }}</span>
+                <input id="mo-tarifa" type="number" min="0" value="{{ tarifa }}" onChange="{{ onTarifa }}" style="flex: 1; width: 100%; min-width: 0; height: 40px; padding: 0 8px 0 0; border: 0; background: transparent; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+              </div>
+            </div>
+          </div>
+          <p style="margin: 0; font-size: 14px; color: #6A5B54">Incluye preparación, horneado, decoración y limpieza.</p>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-top: 12px; border-top: 1px solid #E4DDD5">
+            <span style="font-weight: 600">Mano de obra</span>
+            <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums">{{ moTexto }}</span>
+          </div>
+        </section>
+        <section style="background: #FFFFFF; border: 1px solid #E4DDD5; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 600; font-size: 20px; line-height: 1.25; letter-spacing: -0.01em">Gas, luz y agua</h2>
+            <span style="font-size: 14px; color: #6A5B54">Calcula cada servicio según lo que usa esta receta.</span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 16px">
+            <span style="min-width: 72px; height: 44px; display: flex; align-items: center; font-size: 16px; font-weight: 600">Gas</span>
+            <div style="flex: 1 1 160px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <label for="gas-consumo" style="font-size: 14px; font-weight: 600">Horas de horno</label>
+              <div style="display: flex; align-items: center; height: 44px; padding: 0 12px 0 0; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; min-width: 0">
+                <input id="gas-consumo" type="number" min="0" step="any" value="{{ gasHoras }}" onChange="{{ onGasHoras }}" style="flex: 1; width: 100%; min-width: 0; height: 40px; padding: 0 4px 0 12px; border: 0; background: transparent; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+                <span style="color: #6A5B54; font-size: 14px; white-space: nowrap">h de horno</span>
+              </div>
+            </div>
+            <div style="flex: 1 1 160px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <label for="gas-precio" style="font-size: 14px; font-weight: 600">Precio por hora de horno</label>
+              <div style="display: flex; align-items: center; height: 44px; padding: 0 12px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; min-width: 0">
+                <span style="color: #6A5B54; font-size: 14px; padding-right: 4px">{{ moneda }}</span>
+                <input id="gas-precio" type="number" min="0" step="any" value="{{ gasPrecio }}" onChange="{{ onGasPrecio }}" style="flex: 1; width: 100%; min-width: 0; height: 40px; padding: 0 4px 0 0; border: 0; background: transparent; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+                <span style="color: #6A5B54; font-size: 14px; white-space: nowrap">/ h</span>
+              </div>
+            </div>
+            <span style="flex: 0 0 auto; margin-left: auto; min-width: 96px; height: 44px; display: flex; align-items: center; justify-content: flex-end; font-weight: 600; font-variant-numeric: tabular-nums">{{ gasTexto }}</span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 16px">
+            <span style="min-width: 72px; height: 44px; display: flex; align-items: center; font-size: 16px; font-weight: 600">Luz</span>
+            <div style="flex: 1 1 160px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <label for="luz-consumo" style="font-size: 14px; font-weight: 600">kWh usados</label>
+              <div style="display: flex; align-items: center; height: 44px; padding: 0 12px 0 0; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; min-width: 0">
+                <input id="luz-consumo" type="number" min="0" step="any" value="{{ luzKwh }}" onChange="{{ onLuzKwh }}" style="flex: 1; width: 100%; min-width: 0; height: 40px; padding: 0 4px 0 12px; border: 0; background: transparent; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+                <span style="color: #6A5B54; font-size: 14px; white-space: nowrap">kWh</span>
+              </div>
+            </div>
+            <div style="flex: 1 1 160px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <label for="luz-precio" style="font-size: 14px; font-weight: 600">Precio por kWh</label>
+              <div style="display: flex; align-items: center; height: 44px; padding: 0 12px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; min-width: 0">
+                <span style="color: #6A5B54; font-size: 14px; padding-right: 4px">{{ moneda }}</span>
+                <input id="luz-precio" type="number" min="0" step="any" value="{{ luzPrecio }}" onChange="{{ onLuzPrecio }}" style="flex: 1; width: 100%; min-width: 0; height: 40px; padding: 0 4px 0 0; border: 0; background: transparent; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+                <span style="color: #6A5B54; font-size: 14px; white-space: nowrap">/ kWh</span>
+              </div>
+            </div>
+            <span style="flex: 0 0 auto; margin-left: auto; min-width: 96px; height: 44px; display: flex; align-items: center; justify-content: flex-end; font-weight: 600; font-variant-numeric: tabular-nums">{{ luzTexto }}</span>
+          </div>
+          <span style="font-size: 13px; color: #6A5B54">kWh = watts del equipo × horas de uso ÷ 1000</span>
+          <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 16px">
+            <span style="min-width: 72px; height: 44px; display: flex; align-items: center; font-size: 16px; font-weight: 600">Agua</span>
+            <div style="flex: 1 1 160px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <label for="agua-consumo" style="font-size: 14px; font-weight: 600">Litros usados</label>
+              <div style="display: flex; align-items: center; height: 44px; padding: 0 12px 0 0; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; min-width: 0">
+                <input id="agua-consumo" type="number" min="0" step="any" value="{{ aguaLitros }}" onChange="{{ onAguaLitros }}" style="flex: 1; width: 100%; min-width: 0; height: 40px; padding: 0 4px 0 12px; border: 0; background: transparent; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+                <span style="color: #6A5B54; font-size: 14px; white-space: nowrap">litros</span>
+              </div>
+            </div>
+            <div style="flex: 1 1 160px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <label for="agua-precio" style="font-size: 14px; font-weight: 600">Precio por litro</label>
+              <div style="display: flex; align-items: center; height: 44px; padding: 0 12px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; min-width: 0">
+                <span style="color: #6A5B54; font-size: 14px; padding-right: 4px">{{ moneda }}</span>
+                <input id="agua-precio" type="number" min="0" step="any" value="{{ aguaPrecio }}" onChange="{{ onAguaPrecio }}" style="flex: 1; width: 100%; min-width: 0; height: 40px; padding: 0 4px 0 0; border: 0; background: transparent; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+                <span style="color: #6A5B54; font-size: 14px; white-space: nowrap">/ l</span>
+              </div>
+            </div>
+            <span style="flex: 0 0 auto; margin-left: auto; min-width: 96px; height: 44px; display: flex; align-items: center; justify-content: flex-end; font-weight: 600; font-variant-numeric: tabular-nums">{{ aguaTexto }}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-top: 12px; border-top: 1px solid #E4DDD5">
+            <span style="font-weight: 600">Total gas, luz y agua</span>
+            <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums">{{ giTexto }}</span>
+          </div>
+        </section>
+
+        <section style="background: #FFFFFF; border: 1px solid #E4DDD5; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+          <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 600; font-size: 20px; line-height: 1.25; letter-spacing: -0.01em">Ganancia</h2>
+          <fieldset style="display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; margin: 0; border: 0; min-width: 0; position: relative; background: #F7F3EE; border-radius: 12px"><legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; padding: 0">Base de la ganancia</legend>
+            <sc-for list="{{ modos }}" as="m" hint-placeholder-count="2">
+              <button type="button" aria-pressed="{{ m.pressed }}" onClick="{{ m.onClick }}" style="flex: 1 1 160px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 9px; font-weight: 600; cursor: pointer; background: {{ m.bg }}; color: {{ m.fg }}">{{ m.label }}</button>
+            </sc-for>
+          </fieldset>
+          <div style="display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end">
+            <div style="flex: 0 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <label for="ganancia-pct" style="font-size: 14px; font-weight: 600">Ganancia que quieres</label>
+              <div style="display: flex; align-items: center; height: 44px; padding: 0 12px 0 0; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; min-width: 0">
+                <input id="ganancia-pct" type="number" min="0" value="{{ ganancia }}" onChange="{{ onGanancia }}" style="flex: 1; width: 100%; min-width: 0; height: 40px; padding: 0 4px 0 12px; border: 0; background: transparent; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+                <span style="color: #6A5B54; font-size: 14px">%</span>
+              </div>
+            </div>
+            <div style="flex: 1 1 220px; min-width: 0; display: flex; align-items: center; height: 44px">
+              <input type="range" min="0" max="{{ sliderMax }}" step="1" value="{{ sliderVal }}" onChange="{{ onGanancia }}" aria-label="Ganancia en porcentaje" style="width: 100%; accent-color: {{ acento }}" />
+            </div>
+          </div>
+          <p style="margin: 0; font-size: 14px; color: #6A5B54">{{ equivalencia }}</p>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <span style="font-size: 14px; font-weight: 600">Redondear el precio</span>
+            <fieldset style="display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; margin: 0; border: 0; min-width: 0; position: relative; background: #F7F3EE; border-radius: 12px; align-self: flex-start; max-width: 100%"><legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; padding: 0">Redondeo del precio</legend>
+              <sc-for list="{{ redondeos }}" as="r" hint-placeholder-count="4">
+                <button type="button" aria-pressed="{{ r.pressed }}" onClick="{{ r.onClick }}" style="min-width: 88px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 9px; font-weight: 600; cursor: pointer; background: {{ r.bg }}; color: {{ r.fg }}">{{ r.label }}</button>
+              </sc-for>
+            </fieldset>
+          </div>
+        </section>
+
+        <section style="background: #FFFFFF; border: 1px solid #E4DDD5; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 600; font-size: 20px; line-height: 1.25; letter-spacing: -0.01em">Impuesto (IVA)</h2>
+            <span style="font-size: 14px; color: #6A5B54">Actívalo si cobras IVA a tus clientes. El precio final lo incluye, pero tu ganancia se calcula sin él.</span>
+          </div>
+          <fieldset style="display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; margin: 0; border: 0; min-width: 0; position: relative; background: #F7F3EE; border-radius: 12px; align-self: flex-start; max-width: 100%"><legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; padding: 0">Cobrar IVA</legend>
+            <sc-for list="{{ ivaModos }}" as="iv" hint-placeholder-count="2">
+              <button type="button" aria-pressed="{{ iv.pressed }}" onClick="{{ iv.onClick }}" style="min-width: 120px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 9px; font-weight: 600; cursor: pointer; background: {{ iv.bg }}; color: {{ iv.fg }}">{{ iv.label }}</button>
+            </sc-for>
+          </fieldset>
+          <sc-if value="{{ ivaOn }}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <div style="display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end">
+                <div style="flex: 0 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+                  <label for="iva-tasa" style="font-size: 14px; font-weight: 600">Tasa de IVA</label>
+                  <div style="display: flex; align-items: center; height: 44px; padding: 0 12px 0 0; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; min-width: 0">
+                    <input id="iva-tasa" type="number" min="0" max="100" step="any" value="{{ ivaTasa }}" onChange="{{ onIvaTasa }}" style="flex: 1; width: 100%; min-width: 0; height: 40px; padding: 0 4px 0 12px; border: 0; background: transparent; color: #2A1F1B; font-size: 16px; font-variant-numeric: tabular-nums" />
+                    <span style="color: #6A5B54; font-size: 14px">%</span>
+                  </div>
+                </div>
+                <fieldset style="display: flex; gap: 4px; padding: 4px; margin: 0; border: 0; min-width: 0; position: relative; background: #F7F3EE; border-radius: 12px"><legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; padding: 0">Tasas frecuentes de IVA</legend>
+                  <sc-for list="{{ ivaChips }}" as="ic" hint-placeholder-count="2">
+                    <button type="button" aria-pressed="{{ ic.pressed }}" onClick="{{ ic.onClick }}" style="min-width: 72px; height: 44px; padding: 0 12px; border: 0; border-radius: 9px; font-weight: 600; cursor: pointer; background: {{ ic.bg }}; color: {{ ic.fg }}">{{ ic.label }}</button>
+                  </sc-for>
+                </fieldset>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-top: 12px; border-top: 1px solid #E4DDD5">
+                <span style="font-weight: 600">IVA incluido en el precio</span>
+                <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums">{{ ivaTexto }}</span>
+              </div>
+              <p style="margin: 0; font-size: 14px; color: #6A5B54">El IVA no es ganancia: lo cobras al cliente y lo entregas a Hacienda.</p>
+            </div>
+          </sc-if>
+        </section>
+      </div>
+
+      <aside style="flex: 1 1 340px; min-width: 0">
+        <section style="background: #FFFFFF; border: 1px solid #E4DDD5; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 1px 2px rgba(42,31,27,0.06)">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 13px; font-weight: 600; color: #6A5B54; letter-spacing: 0.02em">{{ eyebrow }}</span>
+            <span style="font-size: 18px; font-weight: 600">{{ nombreMostrado }}</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+              <span style="color: #6A5B54">Completa los datos para ver tu precio.</span>
+            </sc-if>
+            <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 700; font-size: 56px; line-height: 1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; color: {{ acento }}; overflow-wrap: anywhere">{{ precioTexto }}</span>
+            <span style="font-variant-numeric: tabular-nums">{{ precioPorcion }} por porción · {{ porcionesTexto }}</span>
+            <sc-if value="{{ ivaOn }}" hint-placeholder-val="{{ true }}">
+              <span style="font-size: 14px; color: #6A5B54; font-variant-numeric: tabular-nums">Sin IVA {{ baseTexto }} · IVA ({{ ivaTasaTexto }} %) {{ ivaTexto }}</span>
+            </sc-if>
+            <sc-if value="{{ showRounded }}" hint-placeholder-val="{{ true }}">
+              <span style="font-size: 14px; color: #6A5B54; font-variant-numeric: tabular-nums">Redondeado desde {{ pbrutoTexto }}</span>
+            </sc-if>
+          </div>
+
+          <div aria-hidden="true" style="height: 16px; border-radius: 8px; overflow: hidden; display: flex; background: #F7F3EE">
+            <sc-for list="{{ segs }}" as="seg" hint-placeholder-count="4">
+              <div style="height: 100%; width: {{ seg.width }}; background: {{ seg.color }}"></div>
+            </sc-for>
+          </div>
+
+          <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+            <sc-for list="{{ segs }}" as="seg" hint-placeholder-count="4">
+              <li style="display: flex; align-items: center; gap: 10px">
+                <span style="width: 12px; height: 12px; border-radius: 3px; flex: none; background: {{ seg.color }}; border: 1px solid {{ seg.swatchBorder }}"></span>
+                <span style="flex: 1; min-width: 0">{{ seg.label }}</span>
+                <span style="text-align: right; font-variant-numeric: tabular-nums">{{ seg.amount }}</span>
+                <span style="text-align: right; min-width: 56px; color: #6A5B54; font-size: 14px; font-variant-numeric: tabular-nums">{{ seg.pct }}</span>
+              </li>
+            </sc-for>
+          </ul>
+
+          <div style="height: 1px; background: #E4DDD5"></div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <div style="display: flex; justify-content: space-between; gap: 12px; font-weight: 700"><span>Costo total</span><span style="font-variant-numeric: tabular-nums">{{ ctTexto }}</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 12px"><span>Costo por porción</span><span style="font-variant-numeric: tabular-nums">{{ costoPorcion }}</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 12px; font-weight: 700; color: {{ acento }}"><span>Ganancia real</span><span style="font-variant-numeric: tabular-nums">{{ gananciaTexto }}</span></div>
+          </div>
+
+          <div style="background: #F7F3EE; border-radius: 12px; padding: 14px 16px; font-size: 14px; display: flex; flex-direction: column; gap: 4px">
+            <strong>Cómo se calcula</strong>
+            <span style="color: #6A5B54">{{ formula }}</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <div style="display: flex; flex-direction: column; gap: 12px">
+              <sc-if value="{{ isEditing }}" hint-placeholder-val="{{ true }}">
+                <span style="font-size: 14px; color: #6A5B54">Editando: {{ editingName }}</span>
+                <button type="button" onClick="{{ guardarCambios }}" style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 48px; padding: 0 18px; border: 0; border-radius: 10px; background: {{ acento }}; color: #FFFFFF; font-weight: 600; cursor: pointer">Guardar cambios</button>
+                <button type="button" onClick="{{ guardarComoNuevo }}" style="width: 100%; height: 44px; padding: 0 18px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-weight: 600; cursor: pointer">Guardar como nuevo</button>
+              </sc-if>
+              <sc-if value="{{ notEditing }}" hint-placeholder-val="{{ false }}">
+                <button type="button" onClick="{{ guardarComoNuevo }}" style="display: flex; align-items: center; justify-content: center; width: 100%; min-height: 48px; padding: 0 18px; border: 0; border-radius: 10px; background: {{ acento }}; color: #FFFFFF; font-weight: 600; cursor: pointer">Guardar en Mis productos</button>
+              </sc-if>
+              <div aria-live="polite" style="margin-top: {{ saveErrorMargin }}; font-size: 14px; font-weight: 600; color: #8A2A1F">{{ saveError }}</div>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px">
+              <button type="button" onClick="{{ empezarDeCero }}" style="flex: 1 1 140px; height: 44px; padding: 0 18px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-weight: 600; cursor: pointer">Empezar de cero</button>
+              <button type="button" onClick="{{ cargarEjemplo }}" style="flex: 1 1 140px; height: 44px; padding: 0 18px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-weight: 600; cursor: pointer">Cargar ejemplo</button>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ showProductos }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width: 1200px; margin: 0 auto; padding: 32px 24px 56px; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 13px; font-weight: 600; color: #6A5B54; letter-spacing: 0.02em">Mis productos</span>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px">
+        <h1 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 700; font-size: 36px; line-height: 1.1; letter-spacing: -0.01em">Mis productos</h1>
+        <span style="background: #F7F3EE; color: #6A5B54; font-size: 13px; font-weight: 600; border-radius: 999px; padding: 4px 10px">{{ countTexto }}</span>
+      </div>
+      <p style="margin: 0; max-width: 680px; font-size: 14px; color: #6A5B54">Tus productos guardados. Si cambias tu tarifa, tus servicios o tu ganancia, todos los precios se actualizan a la vez.</p>
+    </div>
+
+    <div aria-live="polite" style="margin-top: {{ bannerMargin }}">
+      <sc-if value="{{ hasSaved }}" hint-placeholder-val="{{ true }}">
+        <div style="background: #F7F3EE; border-radius: 12px; padding: 14px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px">
+          <span style="display: inline-flex; align-items: center; gap: 10px; font-weight: 600">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; color: {{ acento }}"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+            Guardado: {{ savedName }}.
+          </span>
+          <button type="button" onClick="{{ irCalculadora }}" style="height: 44px; padding: 0 18px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-weight: 600; cursor: pointer">Seguir calculando</button>
+        </div>
+      </sc-if>
+    </div>
+
+    <section aria-labelledby="ajustes-titulo" style="background: #FFFFFF; border: 1px solid #E4DDD5; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+      <h2 id="ajustes-titulo" style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.25; letter-spacing: -0.01em">Ajustes de precio</h2>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 13px; font-weight: 600; color: #6A5B54; letter-spacing: 0.02em">Costos</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end">
+          <div style="flex: 1 1 180px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+            <label for="ajuste-tarifa" style="font-size: 14px; font-weight: 600">Tarifa por hora</label>
+            <div style="display: flex; align-items: center; height: 44px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; padding: 0 12px; gap: 6px">
+              <span style="color: #6A5B54">{{ moneda }}</span>
+              <input id="ajuste-tarifa" type="number" inputmode="decimal" min="0" step="any" value="{{ tarifa }}" onChange="{{ onTarifa }}" style="flex: 1; min-width: 0; height: 40px; border: 0; background: transparent; padding: 0; font-size: 16px; color: #2A1F1B; font-variant-numeric: tabular-nums" />
+            </div>
+          </div>
+          <div style="flex: 1 1 180px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+            <label for="ajuste-gas" style="font-size: 14px; font-weight: 600">Gas por hora de horno</label>
+            <div style="display: flex; align-items: center; height: 44px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; padding: 0 12px; gap: 6px">
+              <span style="color: #6A5B54">{{ moneda }}</span>
+              <input id="ajuste-gas" type="number" inputmode="decimal" min="0" step="any" value="{{ gasPrecio }}" onChange="{{ onGasPrecio }}" style="flex: 1; min-width: 0; height: 40px; border: 0; background: transparent; padding: 0; font-size: 16px; color: #2A1F1B; font-variant-numeric: tabular-nums" />
+            </div>
+          </div>
+          <div style="flex: 1 1 180px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+            <label for="ajuste-luz" style="font-size: 14px; font-weight: 600">Luz por kWh</label>
+            <div style="display: flex; align-items: center; height: 44px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; padding: 0 12px; gap: 6px">
+              <span style="color: #6A5B54">{{ moneda }}</span>
+              <input id="ajuste-luz" type="number" inputmode="decimal" min="0" step="any" value="{{ luzPrecio }}" onChange="{{ onLuzPrecio }}" style="flex: 1; min-width: 0; height: 40px; border: 0; background: transparent; padding: 0; font-size: 16px; color: #2A1F1B; font-variant-numeric: tabular-nums" />
+            </div>
+          </div>
+          <div style="flex: 1 1 180px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+            <label for="ajuste-agua" style="font-size: 14px; font-weight: 600">Agua por litro</label>
+            <div style="display: flex; align-items: center; height: 44px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; padding: 0 12px; gap: 6px">
+              <span style="color: #6A5B54">{{ moneda }}</span>
+              <input id="ajuste-agua" type="number" inputmode="decimal" min="0" step="any" value="{{ aguaPrecio }}" onChange="{{ onAguaPrecio }}" style="flex: 1; min-width: 0; height: 40px; border: 0; background: transparent; padding: 0; font-size: 16px; color: #2A1F1B; font-variant-numeric: tabular-nums" />
+            </div>
+          </div>
+        </div>
+        <span style="font-size: 13px; color: #6A5B54">kWh = watts del equipo × horas de uso ÷ 1000</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 13px; font-weight: 600; color: #6A5B54; letter-spacing: 0.02em">Precio</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end">
+          <div style="flex: 1 1 140px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+            <label for="ajuste-ganancia" style="font-size: 14px; font-weight: 600">Ganancia</label>
+            <div style="display: flex; align-items: center; height: 44px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; padding: 0 12px; gap: 6px">
+              <input id="ajuste-ganancia" type="number" inputmode="decimal" min="0" step="any" value="{{ ganancia }}" onChange="{{ onGanancia }}" style="flex: 1; min-width: 0; height: 40px; border: 0; background: transparent; padding: 0; font-size: 16px; color: #2A1F1B; font-variant-numeric: tabular-nums" />
+              <span style="color: #6A5B54">%</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <span aria-hidden="true" style="font-size: 14px; font-weight: 600">Ganancia sobre</span>
+            <fieldset style="border: 0; margin: 0; padding: 4px; min-width: 0; display: flex; gap: 4px; background: #F7F3EE; border-radius: 12px; position: relative">
+              <legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; padding: 0">Ganancia calculada sobre</legend>
+              <sc-for list="{{ ajusteModos }}" as="m" hint-placeholder-count="2">
+                <button type="button" aria-pressed="{{ m.pressed }}" onClick="{{ m.onClick }}" style="min-height: 44px; padding: 0 14px; border: 0; border-radius: 9px; font-weight: 600; cursor: pointer; background: {{ m.bg }}; color: {{ m.fg }}">{{ m.label }}</button>
+              </sc-for>
+            </fieldset>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <span aria-hidden="true" style="font-size: 14px; font-weight: 600">Redondeo</span>
+            <fieldset style="border: 0; margin: 0; padding: 4px; min-width: 0; display: flex; flex-wrap: wrap; gap: 4px; background: #F7F3EE; border-radius: 12px; position: relative">
+              <legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; padding: 0">Redondeo</legend>
+              <sc-for list="{{ redondeos }}" as="r" hint-placeholder-count="4">
+                <button type="button" aria-pressed="{{ r.pressed }}" onClick="{{ r.onClick }}" style="min-height: 44px; min-width: 56px; padding: 0 14px; border: 0; border-radius: 9px; font-weight: 600; cursor: pointer; background: {{ r.bg }}; color: {{ r.fg }}">{{ r.label }}</button>
+              </sc-for>
+            </fieldset>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <span aria-hidden="true" style="font-size: 14px; font-weight: 600">IVA</span>
+            <fieldset style="border: 0; margin: 0; padding: 4px; min-width: 0; display: flex; gap: 4px; background: #F7F3EE; border-radius: 12px; position: relative">
+              <legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; padding: 0">IVA</legend>
+              <sc-for list="{{ ivaModos }}" as="v" hint-placeholder-count="2">
+                <button type="button" aria-pressed="{{ v.pressed }}" onClick="{{ v.onClick }}" style="min-height: 44px; padding: 0 14px; border: 0; border-radius: 9px; font-weight: 600; cursor: pointer; background: {{ v.bg }}; color: {{ v.fg }}">{{ v.label }}</button>
+              </sc-for>
+            </fieldset>
+          </div>
+          <sc-if value="{{ ivaOn }}" hint-placeholder-val="{{ true }}">
+            <div style="flex: 0 1 160px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <label for="ajuste-iva" style="font-size: 14px; font-weight: 600">Tasa de IVA</label>
+              <div style="display: flex; align-items: center; height: 44px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; padding: 0 12px; gap: 6px">
+                <input id="ajuste-iva" type="number" inputmode="decimal" min="0" step="any" value="{{ ivaTasa }}" onChange="{{ onIvaTasa }}" style="flex: 1; min-width: 0; height: 40px; border: 0; background: transparent; padding: 0; font-size: 16px; color: #2A1F1B; font-variant-numeric: tabular-nums" />
+                <span style="color: #6A5B54">%</span>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </section>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px">
+      <sc-if value="{{ noProducts }}" hint-placeholder-val="{{ false }}">
+        <section style="flex: 1 1 320px; min-width: 0; background: #FFFFFF; border: 1px solid #E4DDD5; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px">
+          <p style="margin: 0; font-weight: 600">Todavía no tienes productos guardados.</p>
+          <button type="button" onClick="{{ irCalculadora }}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border: 0; border-radius: 10px; background: {{ acento }}; color: #FFFFFF; font-weight: 600; cursor: pointer">Ir a la calculadora</button>
+        </section>
+      </sc-if>
+      <sc-for list="{{ products }}" as="p" hint-placeholder-count="5">
+        <article style="flex: 1 1 320px; min-width: 0; background: #FFFFFF; border: {{ p.border }}; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 1px 2px rgba(42,31,27,0.06)">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px">
+              <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 700; font-size: 20px; line-height: 1.25; letter-spacing: -0.01em; overflow-wrap: anywhere">{{ p.name }}</h2>
+              <sc-if value="{{ p.isSample }}" hint-placeholder-val="{{ true }}">
+                <span style="background: #F7F3EE; color: #6A5B54; font-size: 13px; font-weight: 600; border-radius: 999px; padding: 2px 10px">Ejemplo</span>
+              </sc-if>
+              <sc-if value="{{ p.isSaved }}" hint-placeholder-val="{{ false }}">
+                <span style="background: {{ acento }}; color: #FFFFFF; font-size: 13px; font-weight: 600; border-radius: 999px; padding: 2px 10px">Guardado</span>
+              </sc-if>
+            </div>
+            <span style="font-size: 14px; color: #6A5B54">{{ p.meta }}</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 700; font-size: 36px; line-height: 1.1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; color: {{ acento }}; overflow-wrap: anywhere">{{ p.price }}</span>
+            <span style="font-size: 14px; color: #6A5B54; font-variant-numeric: tabular-nums">{{ p.perPortion }} por porción</span>
+            <sc-if value="{{ p.showIva }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size: 14px; color: #6A5B54; font-variant-numeric: tabular-nums">{{ p.ivaLine }}</span>
+            </sc-if>
+          </div>
+          <div aria-hidden="true" style="display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: #F7F3EE">
+            <div style="width: {{ p.wMp }}; background: #5B3A2E"></div>
+            <div style="width: {{ p.wMo }}; background: #C58A3D"></div>
+            <div style="width: {{ p.wGi }}; background: #E2D3C1"></div>
+            <div style="width: {{ p.wGan }}; background: {{ acento }}"></div>
+            <sc-if value="{{ p.showIva }}" hint-placeholder-val="{{ false }}">
+              <div style="width: {{ p.wIva }}; background: #8F9AA5"></div>
+            </sc-if>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <div style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #6A5B54">Costo total</span><span style="font-variant-numeric: tabular-nums">{{ p.cost }}</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #6A5B54">Ganancia</span><span style="font-weight: 700; font-variant-numeric: tabular-nums">{{ p.profit }}</span></div>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 4px">
+            <button type="button" onClick="{{ p.onEdit }}" style="height: 44px; padding: 0 18px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #2A1F1B; font-weight: 600; cursor: pointer">Ver y editar</button>
+            <button type="button" aria-label="Eliminar {{ p.name }}" onClick="{{ p.onRemove }}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; color: #6A5B54; cursor: pointer">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M6 7l1 12h10l1-12"></path><path d="M9 7V4h6v3"></path></svg>
+            </button>
+          </div>
+        </article>
+      </sc-for>
+      <button type="button" onClick="{{ nuevoProducto }}" style="flex: 1 1 320px; min-width: 0; min-height: 220px; border: 2px dashed #CFC4B9; border-radius: 16px; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #2A1F1B; padding: 24px; text-align: center; cursor: pointer">
+        <span style="width: 44px; height: 44px; border-radius: 50%; background: #F7F3EE; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span>
+        <span style="font-weight: 600">Calcular un producto nuevo</span>
+        <span style="font-size: 14px; color: #6A5B54">Abre la calculadora con tus ingredientes</span>
+      </button>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 14px; color: #6A5B54">
+      <span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: #5B3A2E"></span>Materia prima</span>
+      <span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: #C58A3D"></span>Mano de obra</span>
+      <span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: #E2D3C1; border: 1px solid #CFC4B9"></span>Gas, luz y agua</span>
+      <span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: {{ acento }}"></span>Ganancia</span>
+      <sc-if value="{{ ivaOn }}" hint-placeholder-val="{{ true }}">
+        <span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: #8F9AA5; border: 1px solid #CFC4B9"></span>IVA</span>
+      </sc-if>
+    </div>
+  </main>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"moneda":{"editor":"enum","options":["$","€","S/","Q","₡","Bs"],"default":"$","section":"Estilo"},"acento":{"editor":"color","options":["#B0245A","#8A4B2A","#2F6B5E","#3B4FA0"],"default":"#B0245A","section":"Estilo"},"$preview":{"width":1280,"height":2560}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const products = this.seedProducts();
+    this.state = Object.assign({
+      view: 'calc',
+      products: products,
+      nextProductId: 6,
+      editingId: 1,
+      lastSavedId: null,
+      saveError: '',
+      tarifa: '80',
+      gasPrecio: '14',
+      luzPrecio: '3',
+      aguaPrecio: '0.05',
+      ganancia: '35',
+      modo: 'costo',
+      redondeo: 10,
+      ivaOn: false,
+      ivaTasa: '16'
+    }, this.draftFrom(products[0]));
+  }
+
+  seedProducts() {
+    const r = (id, name, pack, packUnit, price, used, useUnit) => ({ id, name, pack, packUnit, price, used, useUnit });
+    const total = (price) => [{ id: 1, name: 'Ingredientes (total del ejemplo)', pack: '1', packUnit: 'pza', price: price, used: '1', useUnit: 'pza' }];
+    return [
+      {
+        id: 1, name: 'Pastel de chocolate', porciones: '12', horas: '2.5', gasHoras: '1', luzKwh: '1.2', aguaLitros: '20', sample: true,
+        rows: [
+          r(1, 'Harina de trigo', '1', 'kg', '32', '300', 'g'),
+          r(2, 'Azúcar', '1', 'kg', '34', '350', 'g'),
+          r(3, 'Cocoa en polvo', '250', 'g', '68', '80', 'g'),
+          r(4, 'Huevo', '30', 'pza', '95', '4', 'pza'),
+          r(5, 'Mantequilla', '450', 'g', '98', '150', 'g'),
+          r(6, 'Leche entera', '1', 'gal', '106', '250', 'ml'),
+          r(7, 'Polvo para hornear', '220', 'g', '32', '10', 'g'),
+          r(8, 'Chocolate semiamargo', '1', 'kg', '260', '200', 'g'),
+          r(9, 'Crema para batir', '1', 'l', '95', '200', 'ml'),
+          r(10, 'Caja y base para pastel', '1', 'pza', '25', '1', 'pza')
+        ]
+      },
+      { id: 2, name: 'Cheesecake de fresa', porciones: '10', horas: '2', gasHoras: '1.25', luzKwh: '1', aguaLitros: '15', sample: true, rows: total('228.50') },
+      { id: 3, name: 'Pay de limón', porciones: '8', horas: '1.25', gasHoras: '0.25', luzKwh: '0.6', aguaLitros: '10', sample: true, rows: total('96.80') },
+      { id: 4, name: 'Cupcakes de vainilla (docena)', porciones: '12', horas: '1.5', gasHoras: '0.5', luzKwh: '0.8', aguaLitros: '12', sample: true, rows: total('118.20') },
+      { id: 5, name: 'Flan napolitano', porciones: '10', horas: '1', gasHoras: '1', luzKwh: '0.4', aguaLitros: '10', sample: true, rows: total('84.60') }
+    ];
+  }
+
+  cloneRows(rows) {
+    return rows.map((r) => Object.assign({}, r));
+  }
+
+  draftFrom(p) {
+    const rows = this.cloneRows(p.rows);
+    const maxId = rows.reduce((a, r) => (typeof r.id === 'number' && r.id > a ? r.id : a), 0);
+    return {
+      nombre: p.name,
+      porciones: p.porciones,
+      rows: rows,
+      nextId: maxId + 1,
+      horas: p.horas,
+      gasHoras: p.gasHoras,
+      luzKwh: p.luzKwh,
+      aguaLitros: p.aguaLitros
+    };
+  }
+
+  draftVacio() {
+    return {
+      nombre: '',
+      porciones: '1',
+      rows: [{ id: 1, name: '', pack: '', packUnit: 'g', price: '', used: '', useUnit: 'g' }],
+      nextId: 2,
+      horas: '',
+      gasHoras: '',
+      luzKwh: '',
+      aguaLitros: ''
+    };
+  }
+
+  componentDidMount() {
+    try {
+      const raw = window.localStorage.getItem('calcPasteleria.productos.v1');
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      if (d && Array.isArray(d.products)) {
+        const str = (v, dflt) => (v === undefined || v === null ? dflt : String(v));
+        const prods = d.products
+          .filter((p) => p && typeof p === 'object' && typeof p.id === 'number' && Array.isArray(p.rows))
+          .map((p) => ({
+            id: p.id,
+            name: str(p.name, ''),
+            porciones: str(p.porciones, '1'),
+            rows: p.rows.filter((r) => r && typeof r === 'object').map((r, i) => ({
+              id: typeof r.id === 'number' ? r.id : i + 1,
+              name: str(r.name, ''),
+              pack: str(r.pack, ''),
+              packUnit: str(r.packUnit, 'g'),
+              price: str(r.price, ''),
+              used: str(r.used, ''),
+              useUnit: str(r.useUnit, 'g')
+            })),
+            horas: str(p.horas, ''),
+            gasHoras: str(p.gasHoras, ''),
+            luzKwh: str(p.luzKwh, ''),
+            aguaLitros: str(p.aguaLitros, ''),
+            sample: p.sample === true
+          }));
+        const maxId = prods.reduce((a, p) => (p.id > a ? p.id : a), 0);
+        const upd = { products: prods, nextProductId: Math.max(Math.floor(this.num(d.nextProductId)), maxId + 1) };
+        const editado = prods.find((p) => p.id === this.state.editingId);
+        if (editado) Object.assign(upd, this.draftFrom(editado));
+        else upd.editingId = null;
+        this.setState(upd);
+      }
+    } catch (err) {
+      // El almacenamiento es opcional: se ignora cualquier error.
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.products !== prevState.products) {
+      try {
+        window.localStorage.setItem('calcPasteleria.productos.v1', JSON.stringify({ products: this.state.products, nextProductId: this.state.nextProductId }));
+      } catch (err) {
+        // Se ignora.
+      }
+    }
+  }
+
+  num(v) {
+    const n = parseFloat(String(v).replace(',', '.'));
+    return isFinite(n) ? n : 0;
+  }
+
+  set(key, val) { this.setState({ [key]: val }); }
+
+  rowInfo(r) {
+    const UNITS = {
+      g: { dim: 'masa', f: 1 }, kg: { dim: 'masa', f: 1000 },
+      ml: { dim: 'volumen', f: 1 }, l: { dim: 'volumen', f: 1000 }, gal: { dim: 'volumen', f: 3785.41 },
+      pza: { dim: 'piezas', f: 1 }
+    };
+    const pu = UNITS[r.packUnit] || UNITS.g;
+    const uu = UNITS[r.useUnit] || UNITS.g;
+    const pack = this.num(r.pack);
+    const ok = pu.dim === uu.dim && pack > 0;
+    const compat = pu.dim === uu.dim;
+    const cost = ok ? (this.num(r.price) / (pack * pu.f)) * this.num(r.used) * uu.f : 0;
+    return { cost, compat };
+  }
+
+  // Precio de un producto (o del borrador) con los ajustes compartidos.
+  calc(p, s) {
+    const infos = p.rows.map((r) => this.rowInfo(r));
+    const mp = infos.reduce((a, x) => a + x.cost, 0);
+    const mo = this.num(p.horas) * this.num(s.tarifa);
+    const gas = this.num(p.gasHoras) * this.num(s.gasPrecio);
+    const luz = this.num(p.luzKwh) * this.num(s.luzPrecio);
+    const agua = this.num(p.aguaLitros) * this.num(s.aguaPrecio);
+    const gi = gas + luz + agua;
+    const ct = mp + mo + gi;
+    let g = this.num(s.ganancia);
+    if (g < 0) g = 0;
+    let p0;
+    if (s.modo === 'costo') {
+      p0 = ct * (1 + g / 100);
+    } else {
+      const gc = Math.min(95, Math.max(0, g));
+      p0 = ct / (1 - gc / 100);
+    }
+    const step = s.redondeo;
+    const t = s.ivaOn ? Math.min(100, Math.max(0, this.num(s.ivaTasa))) : 0;
+    const pbruto = p0 * (1 + t / 100);
+    const P = step === 0 ? pbruto : Math.ceil(pbruto / step - 1e-9) * step;
+    const base = P / (1 + t / 100);
+    const iva = P - base;
+    const gReal = Math.abs(base - ct) < 1e-6 ? 0 : base - ct;
+    const porc = Math.max(1, this.num(p.porciones));
+    const sh = (v) => (P > 0 ? Math.max(0, v / P * 100) : 0);
+    return {
+      infos, mp, mo, gas, luz, agua, gi, ct, g, p0, step, t, pbruto, P, base, iva, gReal, porc,
+      porPorcion: P / porc,
+      costoPorcion: ct / porc,
+      shares: { mp: sh(mp), mo: sh(mo), gi: sh(gi), gan: sh(gReal), iva: sh(iva) }
+    };
+  }
+
+  updateRow(id, field, val) {
+    this.setState({ rows: this.state.rows.map((r) => (r.id === id ? Object.assign({}, r, { [field]: val }) : r)) });
+  }
+
+  setPackUnit(id, val) {
+    const dim = { g: 'm', kg: 'm', ml: 'v', l: 'v', gal: 'v', pza: 'p' };
+    const base = { m: 'g', v: 'ml', p: 'pza' };
+    this.setState({
+      rows: this.state.rows.map((r) => {
+        if (r.id !== id) return r;
+        const upd = { packUnit: val };
+        if (dim[val] !== dim[r.useUnit]) upd.useUnit = base[dim[val]];
+        return Object.assign({}, r, upd);
+      })
+    });
+  }
+
+  removeRow(id) {
+    this.setState({ rows: this.state.rows.filter((r) => r.id !== id) });
+  }
+
+  addRow() {
+    const id = this.state.nextId;
+    this.setState({
+      rows: this.state.rows.concat([{ id: id, name: '', pack: '', packUnit: 'g', price: '', used: '', useUnit: 'g' }]),
+      nextId: id + 1
+    });
+  }
+
+  empezarDeCero() {
+    this.setState(Object.assign(this.draftVacio(), { editingId: null, saveError: '' }));
+  }
+
+  cargarEjemplo() {
+    const sample = this.seedProducts()[0];
+    const existe = this.state.products.some((p) => p.id === 1);
+    this.setState(Object.assign(this.draftFrom(sample), { editingId: existe ? 1 : null, saveError: '' }));
+  }
+
+  nuevoProducto() {
+    this.setState(Object.assign(this.draftVacio(), { editingId: null, lastSavedId: null, saveError: '', view: 'calc' }));
+  }
+
+  verYEditar(p) {
+    this.setState(Object.assign(this.draftFrom(p), { editingId: p.id, saveError: '', view: 'calc' }));
+  }
+
+  eliminar(id) {
+    const s = this.state;
+    const upd = { products: s.products.filter((p) => p.id !== id) };
+    if (s.editingId === id) upd.editingId = null;
+    if (s.lastSavedId === id) upd.lastSavedId = null;
+    this.setState(upd);
+  }
+
+  guardar(comoNuevo) {
+    const s = this.state;
+    if (s.nombre.trim() === '') {
+      this.setState({ saveError: 'Ponle un nombre al producto para guardarlo.' });
+      return;
+    }
+    if (this.calc(s, s).ct <= 0) {
+      this.setState({ saveError: 'Agrega al menos un costo antes de guardar.' });
+      return;
+    }
+    const data = {
+      name: s.nombre.trim(),
+      porciones: s.porciones,
+      rows: this.cloneRows(s.rows),
+      horas: s.horas,
+      gasHoras: s.gasHoras,
+      luzKwh: s.luzKwh,
+      aguaLitros: s.aguaLitros,
+      sample: false
+    };
+    const editando = !comoNuevo && s.products.some((p) => p.id === s.editingId);
+    let products;
+    let nextProductId = s.nextProductId;
+    let id;
+    if (editando) {
+      id = s.editingId;
+      products = s.products.map((p) => (p.id === id ? Object.assign({ id: id }, data) : p));
+    } else {
+      id = nextProductId;
+      nextProductId = nextProductId + 1;
+      products = [Object.assign({ id: id }, data)].concat(s.products);
+    }
+    this.setState({ products, nextProductId, editingId: id, lastSavedId: id, view: 'productos', saveError: '' });
+  }
+
+  renderVals() {
+    const moneda = this.props.moneda ?? '$';
+    const acento = this.props.acento ?? '#B0245A';
+    const s = this.state;
+    const fmt = new Intl.NumberFormat('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtP = new Intl.NumberFormat('es-MX', { maximumFractionDigits: 1 });
+    const fmtT = new Intl.NumberFormat('es-MX', { maximumFractionDigits: 2 });
+    const money = (n) => moneda + fmt.format(Math.abs(n) < 0.005 ? 0 : n);
+    const pct = (n) => fmtP.format(n) + ' %';
+
+    const c = this.calc(s, s);
+    const infos = c.infos;
+    const porcTxt = c.porc === 1 ? '1 porción' : fmtP.format(c.porc) + ' porciones';
+
+    let equiv;
+    if (s.modo === 'costo') {
+      const x = c.p0 > 0 ? (c.p0 - c.ct) / c.p0 * 100 : 0;
+      equiv = 'Equivale a un margen de ' + pct(x) + ' sobre el precio de venta';
+    } else {
+      const x = c.ct > 0 ? (c.p0 - c.ct) / c.ct * 100 : 0;
+      equiv = 'Equivale a ' + pct(x) + ' sobre el costo';
+    }
+
+    const segDefs = [
+      { label: 'Materia prima', v: c.mp, sh: c.shares.mp, color: '#5B3A2E', swatchBorder: '#5B3A2E' },
+      { label: 'Mano de obra', v: c.mo, sh: c.shares.mo, color: '#C58A3D', swatchBorder: '#C58A3D' },
+      { label: 'Gas, luz y agua', v: c.gi, sh: c.shares.gi, color: '#E2D3C1', swatchBorder: '#CFC4B9' },
+      { label: 'Ganancia', v: c.gReal, sh: c.shares.gan, color: acento, swatchBorder: acento }
+    ];
+    if (s.ivaOn) segDefs.push({ label: 'IVA', v: c.iva, sh: c.shares.iva, color: '#8F9AA5', swatchBorder: '#CFC4B9' });
+    const segs = segDefs.map((d) => ({
+      label: d.label, color: d.color, swatchBorder: d.swatchBorder, amount: money(d.v), pct: pct(d.sh), width: d.sh.toFixed(2) + '%'
+    }));
+
+    const rows = s.rows.map((r, i) => Object.assign({}, r, {
+      num: i + 1,
+      moneda: moneda,
+      costTexto: infos[i].compat ? money(infos[i].cost) : 'No compatibles',
+      costSize: infos[i].compat ? '16px' : '13px',
+      costColor: infos[i].compat ? '#2A1F1B' : '#8A2A1F',
+      onName: (e) => this.updateRow(r.id, 'name', e.target.value),
+      onPack: (e) => this.updateRow(r.id, 'pack', e.target.value),
+      onPackUnit: (e) => this.setPackUnit(r.id, e.target.value),
+      onPrice: (e) => this.updateRow(r.id, 'price', e.target.value),
+      onUsed: (e) => this.updateRow(r.id, 'used', e.target.value),
+      onUseUnit: (e) => this.updateRow(r.id, 'useUnit', e.target.value),
+      remove: () => this.removeRow(r.id)
+    }));
+
+    const modoDefs = (labels) => [
+      { key: 'costo', label: labels[0] },
+      { key: 'precio', label: labels[1] }
+    ].map((m) => {
+      const on = s.modo === m.key;
+      return {
+        label: m.label, pressed: on, bg: on ? acento : 'transparent', fg: on ? '#FFFFFF' : '#2A1F1B',
+        onClick: () => {
+          const upd = { modo: m.key };
+          if (m.key === 'precio' && this.num(this.state.ganancia) > 95) upd.ganancia = '95';
+          this.setState(upd);
+        }
+      };
+    });
+    const modos = modoDefs(['Sobre el costo', 'Sobre el precio de venta']);
+    const ajusteModos = modoDefs(['Sobre el costo', 'Sobre el precio']);
+
+    const redondeos = [
+      { v: 0, label: 'Sin redondeo' },
+      { v: 1, label: moneda + '1' },
+      { v: 5, label: moneda + '5' },
+      { v: 10, label: moneda + '10' }
+    ].map((r) => {
+      const on = s.redondeo === r.v;
+      return { label: r.label, pressed: on, bg: on ? acento : 'transparent', fg: on ? '#FFFFFF' : '#2A1F1B', onClick: () => this.set('redondeo', r.v) };
+    });
+
+    const ivaModos = [
+      { v: false, label: 'Sin IVA' },
+      { v: true, label: 'Con IVA' }
+    ].map((m) => {
+      const on = s.ivaOn === m.v;
+      return { label: m.label, pressed: on, bg: on ? acento : 'transparent', fg: on ? '#FFFFFF' : '#2A1F1B', onClick: () => this.set('ivaOn', m.v) };
+    });
+    const curIva = this.num(s.ivaTasa);
+    const ivaChips = [8, 16].map((v) => {
+      const on = s.ivaTasa !== '' && curIva === v;
+      return { label: v + ' %', pressed: on, bg: on ? acento : 'transparent', fg: on ? '#FFFFFF' : '#2A1F1B', onClick: () => this.set('ivaTasa', String(v)) };
+    });
+
+    const sliderMax = s.modo === 'precio' ? 95 : 100;
+    const sliderVal = Math.min(sliderMax, Math.max(0, c.g));
+    const formula = (s.modo === 'costo'
+      ? 'Precio = costo total × (1 + ganancia). Costo total = materia prima + mano de obra + gas, luz y agua.'
+      : 'Precio = costo total ÷ (1 − margen). Costo total = materia prima + mano de obra + gas, luz y agua.')
+      + (s.ivaOn ? ' Con IVA: precio final = precio × (1 + IVA), y después se redondea.' : '');
+
+    // Productos guardados
+    const products = s.products.map((p) => {
+      const k = this.calc(p, s);
+      const w = (v) => v.toFixed(3) + '%';
+      const rinde = k.porc === 1 ? 'Rinde 1 porción' : 'Rinde ' + fmtT.format(k.porc) + ' porciones';
+      const isSaved = s.lastSavedId !== null && p.id === s.lastSavedId;
+      return {
+        id: p.id,
+        name: p.name,
+        isSample: p.sample === true,
+        isSaved: isSaved,
+        border: isSaved ? '2px solid ' + acento : '1px solid #E4DDD5',
+        meta: rinde + ' · ' + fmtT.format(this.num(p.horas)) + ' h de trabajo · ' + fmtT.format(this.num(p.gasHoras)) + ' h de horno',
+        price: money(k.P),
+        perPortion: money(k.porPorcion),
+        showIva: s.ivaOn,
+        ivaLine: 'Sin IVA ' + money(k.base) + ' · IVA ' + money(k.iva),
+        cost: money(k.ct),
+        profit: money(k.gReal),
+        wMp: w(k.shares.mp), wMo: w(k.shares.mo), wGi: w(k.shares.gi), wGan: w(k.shares.gan),
+        wIva: s.ivaOn ? w(k.shares.iva) : '0%',
+        onEdit: () => this.verYEditar(p),
+        onRemove: () => this.eliminar(p.id)
+      };
+    });
+    const nProd = s.products.length;
+    const editing = s.products.find((p) => p.id === s.editingId);
+    const saved = s.lastSavedId === null ? undefined : s.products.find((p) => p.id === s.lastSavedId);
+    const enCalc = s.view === 'calc';
+    const hasSaveError = s.saveError !== '';
+
+    return {
+      moneda, acento,
+      showCalc: enCalc,
+      showProductos: !enCalc,
+      irCalculadora: () => this.set('view', 'calc'),
+      irProductos: () => this.set('view', 'productos'),
+      calcCurrent: enCalc ? 'page' : undefined,
+      productosCurrent: enCalc ? undefined : 'page',
+      calcBg: enCalc ? acento : 'transparent',
+      calcFg: enCalc ? '#FFFFFF' : '#2A1F1B',
+      calcWeight: enCalc ? '600' : '500',
+      productosBg: enCalc ? 'transparent' : acento,
+      productosFg: enCalc ? '#2A1F1B' : '#FFFFFF',
+      productosWeight: enCalc ? '500' : '600',
+      nombre: s.nombre,
+      porciones: s.porciones,
+      onNombre: (e) => this.setState({ nombre: e.target.value, saveError: '' }),
+      onPorciones: (e) => this.set('porciones', e.target.value),
+      rows,
+      noRows: s.rows.length === 0,
+      hasUnitIssues: infos.some((x) => !x.compat),
+      addRow: () => this.addRow(),
+      mpTexto: money(c.mp),
+      horas: s.horas,
+      tarifa: s.tarifa,
+      onHoras: (e) => this.set('horas', e.target.value),
+      onTarifa: (e) => this.set('tarifa', e.target.value),
+      moTexto: money(c.mo),
+      gasHoras: s.gasHoras,
+      gasPrecio: s.gasPrecio,
+      luzKwh: s.luzKwh,
+      luzPrecio: s.luzPrecio,
+      aguaLitros: s.aguaLitros,
+      aguaPrecio: s.aguaPrecio,
+      onGasHoras: (e) => this.set('gasHoras', e.target.value),
+      onGasPrecio: (e) => this.set('gasPrecio', e.target.value),
+      onLuzKwh: (e) => this.set('luzKwh', e.target.value),
+      onLuzPrecio: (e) => this.set('luzPrecio', e.target.value),
+      onAguaLitros: (e) => this.set('aguaLitros', e.target.value),
+      onAguaPrecio: (e) => this.set('aguaPrecio', e.target.value),
+      gasTexto: money(c.gas),
+      luzTexto: money(c.luz),
+      aguaTexto: money(c.agua),
+      giTexto: money(c.gi),
+      modos,
+      ajusteModos,
+      ganancia: s.ganancia,
+      onGanancia: (e) => this.set('ganancia', e.target.value),
+      sliderMax,
+      sliderVal,
+      equivalencia: equiv,
+      redondeos,
+      nombreMostrado: s.nombre.trim() === '' ? 'Tu producto' : s.nombre,
+      isEmpty: c.ct <= 0,
+      precioTexto: money(c.P),
+      precioPorcion: money(c.porPorcion),
+      porcionesTexto: porcTxt,
+      showRounded: c.step > 0 && Math.abs(c.P - c.pbruto) > 0.005,
+      pbrutoTexto: money(c.pbruto),
+      eyebrow: s.ivaOn ? 'Precio de venta sugerido · IVA incluido' : 'Precio de venta sugerido',
+      ivaOn: s.ivaOn,
+      ivaTasa: s.ivaTasa,
+      onIvaTasa: (e) => this.set('ivaTasa', e.target.value),
+      ivaModos,
+      ivaChips,
+      ivaTexto: money(c.iva),
+      baseTexto: money(c.base),
+      ivaTasaTexto: fmtT.format(c.t),
+      segs,
+      ctTexto: money(c.ct),
+      costoPorcion: money(c.costoPorcion),
+      gananciaTexto: money(c.gReal),
+      formula,
+      empezarDeCero: () => this.empezarDeCero(),
+      cargarEjemplo: () => this.cargarEjemplo(),
+      isEditing: editing !== undefined,
+      notEditing: editing === undefined,
+      editingName: editing ? editing.name : '',
+      guardarCambios: () => this.guardar(false),
+      guardarComoNuevo: () => this.guardar(true),
+      saveError: s.saveError,
+      saveErrorMargin: hasSaveError ? '0' : '-12px',
+      products,
+      noProducts: nProd === 0,
+      countTexto: nProd === 1 ? '1 producto' : nProd + ' productos',
+      hasSaved: saved !== undefined,
+      savedName: saved ? saved.name : '',
+      bannerMargin: saved !== undefined ? '0' : '-24px',
+      nuevoProducto: () => this.nuevoProducto()
+    };
+  }
+}
+</script>
+</body>
+</html>

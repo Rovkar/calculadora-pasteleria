@@ -1,0 +1,73 @@
+.calc { display: flex; flex-direction: column; gap: var(--space-6); }
+.calc__intro { display: flex; flex-direction: column; gap: var(--space-2); }
+.calc__intro h1 { font-size: 36px; line-height: 1.1; margin: 0; }
+.calc__intro p { margin: 0; max-width: 680px; color: var(--muted); }
+.calc__layout { display: grid; gap: var(--space-6); grid-template-columns: minmax(0, 1fr); align-items: start; }
+.calc__inputs { display: flex; flex-direction: column; gap: var(--space-6); min-width: 0; container: calcinputs / inline-size; }
+.calc__stack { display: flex; flex-direction: column; gap: var(--space-4); }
+.calc__row2 { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.calc__muted { margin: 0; color: var(--muted); }
+.calc__small { margin: 0; font-size: 14px; color: var(--muted); }
+.calc__total { display: flex; justify-content: space-between; gap: var(--space-3); font-weight: 700; padding-top: var(--space-3); border-top: 1px solid var(--border); }
+.calc__list { margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+.calc__cardtotal { font-family: var(--font-display); font-weight: 700; font-size: 20px; font-variant-numeric: tabular-nums; }
+.calc__listfoot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3) var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--border); }
+.calc__total--inline { padding-top: 0; border-top: 0; gap: var(--space-4); }
+.calc__legend { font-size: 14px; font-weight: 600; }
+.calc__svc { display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); align-items: end; }
+.calc__svc-sub { display: flex; flex-direction: column; gap: 2px; font-weight: 600; min-height: var(--control-height); justify-content: center; }
+.calc__svc-sub span:first-child { font-size: 14px; color: var(--muted); font-weight: 500; }
+.calc__range { width: 100%; accent-color: var(--accent); height: 44px; margin: 0; }
+.calc__ivaRow { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: end; }
+
+.calc__results { display: flex; flex-direction: column; gap: var(--space-4); scroll-margin-top: calc(var(--header-h) + 16px); }
+.calc__eyebrow { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0.02em; }
+.calc__pname { margin: 0; font-size: 20px; overflow-wrap: anywhere; }
+.calc__price { font-family: var(--font-display); font-weight: 700; font-size: 56px; line-height: 1; letter-spacing: -0.01em; color: var(--accent); font-variant-numeric: tabular-nums; }
+.calc__line { display: flex; justify-content: space-between; gap: var(--space-3); }
+.calc__line--bold { font-weight: 700; }
+.calc__line--accent { font-weight: 700; color: var(--accent); }
+.calc__facts { display: flex; flex-direction: column; gap: var(--space-2); }
+.calc__how { background: var(--soft); border-radius: 12px; padding: 14px 16px; font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
+.calc__how span { color: var(--muted); }
+.calc__save { display: flex; flex-direction: column; gap: var(--space-3); }
+.calc__err { font-size: 14px; font-weight: 600; color: var(--error); }
+.calc__err { overflow-wrap: anywhere; }
+/* Always in the tree (a live region must exist before its text changes); cancel the flex gap while it is empty. */
+.calc__err:empty { margin-top: calc(-1 * var(--space-3)); }
+.calc__aux { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.calc__aux > * { flex: 1 1 140px; }
+
+.calc__bar { display: none; }
+
+@media (min-width: 1024px) {
+  .calc__layout { grid-template-columns: minmax(0, 1fr) 400px; }
+  .calc__sticky {
+    position: sticky;
+    top: calc(var(--header-h) + 16px);
+    max-height: calc(100vh - var(--header-h) - 32px);
+    max-height: calc(100dvh - var(--header-h) - 32px);
+    overflow-y: auto;
+    /* room for focus rings, which overflow:auto would otherwise clip */
+    padding: 4px;
+    margin: -4px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .calc { padding-bottom: 88px; }
+  .calc__price { font-size: 48px; }
+  .calc__bar {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+    position: fixed; left: 0; right: 0; bottom: var(--bottom-nav-height); z-index: 20;
+    padding: 10px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); background: var(--surface); border-top: 1px solid var(--border); box-shadow: var(--shadow-soft);
+  }
+  .calc__bar-price { display: flex; flex-direction: column; min-width: 0; }
+  .calc__bar-big { font-family: var(--font-display); font-weight: 700; font-size: 24px; line-height: 1.1; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .calc__bar-sub { font-size: 14px; color: var(--muted); }
+}
+
+/* No bottom nav between 900 and 1023px: the bar is the lowest element, so it must clear the home indicator itself. */
+@media (min-width: 900px) and (max-width: 1023px) {
+  .calc__bar { padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+}

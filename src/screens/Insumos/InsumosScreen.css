@@ -1,0 +1,67 @@
+.insumos__intro { margin-bottom: 24px; }
+.insumos__eyebrow { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0.02em; }
+.insumos__intro h1 { margin: 4px 0 8px; }
+.insumos__intro p { margin: 0; max-width: 680px; font-size: 14px; color: var(--muted); }
+
+.insumos__toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between; margin-bottom: 16px; }
+.insumos__search { flex: 1 1 260px; max-width: 360px; min-width: 0; }
+.insumos__search-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.insumos__search-box { position: relative; }
+.insumos__search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+.insumos__search-box input { width: 100%; min-height: var(--control-height); padding: 0 12px 0 40px; border: 1px solid var(--input-border); border-radius: var(--radius-control); background: var(--surface); color: var(--ink); font-size: 16px; }
+.insumos__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.insumos__count { font-size: 14px; color: var(--muted); }
+
+.insumos__table { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.insumos__list { list-style: none; margin: 0; padding: 0; }
+.insumos__none { margin: 0; padding: 32px 20px; text-align: center; color: var(--muted); }
+
+.insumo-head,
+.insumo-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 2.4fr) minmax(80px, 1fr) 96px minmax(120px, 1.2fr) minmax(100px, 1.2fr) minmax(100px, 1.2fr) 44px;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 20px;
+}
+.insumo-head { background: var(--soft); padding-top: 12px; padding-bottom: 12px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.insumo-head__right { text-align: right; }
+.insumo-row { border-top: 1px solid var(--border); }
+.insumo-row:first-child { border-top: 0; }
+.insumo-row__cost { text-align: right; }
+.insumo-row__none { color: var(--muted); }
+.insumo-row__cost-label { display: none; }
+.insumo-row .field__label {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.insumos__info { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 24px; }
+.insumos__info > * { flex: 1 1 300px; min-width: 0; }
+.insumos__info p { margin: 0 0 8px; font-size: 14px; color: var(--muted); }
+.insumos__link { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-decoration: underline; color: var(--accent); }
+
+@media (max-width: 859px) {
+  .insumo-head { display: none; }
+  .insumo-row {
+    grid-template-columns: 1fr 96px 1fr;
+    grid-template-areas:
+      "name name remove"
+      "pack unit price"
+      "cost cost kg";
+    gap: 10px;
+    align-items: end;
+    padding: 14px 16px;
+    position: relative;
+  }
+  .insumo-row .field__label {
+    position: static; width: auto; height: auto; margin: 0; overflow: visible; clip: auto; white-space: normal; font-size: 13px; color: var(--muted);
+  }
+  .insumo-row__name { grid-area: name; }
+  .insumo-row__pack { grid-area: pack; }
+  .insumo-row__unit { grid-area: unit; }
+  .insumo-row__price { grid-area: price; }
+  .insumo-row__remove { grid-area: remove; justify-self: end; align-self: end; }
+  .insumo-row__cost { grid-area: cost; text-align: left; display: flex; flex-direction: column; }
+  .insumo-row__cost--kg { grid-area: kg; text-align: right; align-items: flex-end; }
+  .insumo-row__cost-label { display: block; font-size: 13px; color: var(--muted); }
+}

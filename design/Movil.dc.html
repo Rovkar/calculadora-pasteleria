@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Cálculo rápido</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap">
+<style>
+body{margin:0;background:#F4F1EC;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#2A1F1B}
+a:hover{color:#B0245A}
+input,select,button{font-family:inherit;font-size:inherit;color:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #2A1F1B;outline-offset:2px}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; overflow-y: auto; background: #F4F1EC; color: #2A1F1B; font-family: 'DM Sans', system-ui, sans-serif; font-size: 16px; line-height: 1.5; display: flex; flex-direction: column">
+  <div style="background: #FFFFFF; border-bottom: 1px solid #E4DDD5; padding: 8px 12px; display: flex; align-items: center; gap: 4px; flex-shrink: 0">
+    <a href="Main.dc.html" aria-label="Volver a la calculadora completa" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: #2A1F1B; text-decoration: none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 20px; font-weight: 700; letter-spacing: -0.01em">Cálculo rápido</span>
+  </div>
+
+  <div style="padding: 16px; display: flex; flex-direction: column; gap: 16px">
+
+    <section style="background: #FFFFFF; border-radius: 20px; padding: 20px; border: 1px solid #E4DDD5; display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 13px; font-weight: 600; color: #6A5B54; letter-spacing: 0.02em">{{ eyebrow }}</span>
+      <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 48px; line-height: 1; font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; color: {{ acento }}">{{ precio }}</span>
+      <span style="font-size: 16px; color: #2A1F1B; font-variant-numeric: tabular-nums">{{ precioPorcion }} por porción</span>
+      <sc-if value="{{ ivaOn }}" hint-placeholder-val="{{ true }}">
+        <span style="font-size: 14px; color: #6A5B54; font-variant-numeric: tabular-nums">Sin IVA {{ baseSinIva }} · IVA {{ ivaMonto }}</span>
+      </sc-if>
+      <div aria-hidden="true" style="display: flex; height: 12px; border-radius: 6px; overflow: hidden; background: #F7F3EE; margin-top: 8px">
+        <sc-for list="{{ segs }}" as="seg" hint-placeholder-count="4">
+          <div style="height: 12px; width: {{ seg.width }}; background: {{ seg.color }}"></div>
+        </sc-for>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; font-size: 13px; margin-top: 4px">
+        <sc-for list="{{ segs }}" as="seg" hint-placeholder-count="4">
+          <div style="display: flex; align-items: flex-start; gap: 8px; min-width: 0">
+            <span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; margin-top: 4px; background: {{ seg.color }}; border: 1px solid {{ seg.border }}"></span>
+            <span style="display: flex; flex-direction: column; min-width: 0; line-height: 1.35"><span style="color: #6A5B54">{{ seg.label }}</span><span style="font-weight: 600; font-variant-numeric: tabular-nums">{{ seg.amount }} · {{ seg.pct }}</span></span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="background: #FFFFFF; border-radius: 20px; padding: 20px; border: 1px solid #E4DDD5; display: flex; flex-direction: column; gap: 14px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 20px; line-height: 1.25; font-weight: 600; letter-spacing: -0.01em">Tus costos</h2>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="rapido-mp" style="font-size: 14px; font-weight: 600">Materia prima total</label>
+        <div style="display: flex; align-items: center; height: 48px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; padding: 0 12px; gap: 6px">
+          <span style="color: #6A5B54; font-size: 17px">{{ moneda }}</span>
+          <input id="rapido-mp" type="number" inputmode="decimal" step="any" min="0" value="{{ mp }}" onChange="{{ onMp }}" style="flex: 1; min-width: 0; height: 46px; border: 0; background: transparent; font-size: 17px; font-variant-numeric: tabular-nums" />
+        </div>
+        <span style="font-size: 14px; color: #6A5B54">Lo que gastaste en ingredientes y empaque.</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+          <label for="rapido-horas" style="font-size: 14px; font-weight: 600">Horas de trabajo</label>
+          <input id="rapido-horas" type="number" inputmode="decimal" step="0.25" min="0" value="{{ horas }}" onChange="{{ onHoras }}" style="width: 100%; height: 48px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; padding: 0 12px; font-size: 17px; font-variant-numeric: tabular-nums" />
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+          <label for="rapido-tarifa" style="font-size: 14px; font-weight: 600">Tarifa por hora</label>
+          <div style="display: flex; align-items: center; height: 48px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; padding: 0 12px; gap: 6px">
+            <span style="color: #6A5B54; font-size: 17px">{{ moneda }}</span>
+            <input id="rapido-tarifa" type="number" inputmode="decimal" step="any" min="0" value="{{ tarifa }}" onChange="{{ onTarifa }}" style="flex: 1; min-width: 0; height: 46px; border: 0; background: transparent; font-size: 17px; font-variant-numeric: tabular-nums" />
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 14px; font-weight: 600">Gas, luz y agua</span>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+          <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+            <label for="rapido-gas" style="font-size: 14px; font-weight: 600">Gas</label>
+            <div style="display: flex; align-items: center; height: 48px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; padding: 0 8px; gap: 4px">
+              <span style="color: #6A5B54; font-size: 17px">{{ moneda }}</span>
+              <input id="rapido-gas" type="number" inputmode="decimal" step="any" min="0" value="{{ gas }}" onChange="{{ onGas }}" style="flex: 1; min-width: 0; height: 46px; border: 0; background: transparent; font-size: 17px; font-variant-numeric: tabular-nums" />
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+            <label for="rapido-luz" style="font-size: 14px; font-weight: 600">Luz</label>
+            <div style="display: flex; align-items: center; height: 48px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; padding: 0 8px; gap: 4px">
+              <span style="color: #6A5B54; font-size: 17px">{{ moneda }}</span>
+              <input id="rapido-luz" type="number" inputmode="decimal" step="any" min="0" value="{{ luz }}" onChange="{{ onLuz }}" style="flex: 1; min-width: 0; height: 46px; border: 0; background: transparent; font-size: 17px; font-variant-numeric: tabular-nums" />
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+            <label for="rapido-agua" style="font-size: 14px; font-weight: 600">Agua</label>
+            <div style="display: flex; align-items: center; height: 48px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; padding: 0 8px; gap: 4px">
+              <span style="color: #6A5B54; font-size: 17px">{{ moneda }}</span>
+              <input id="rapido-agua" type="number" inputmode="decimal" step="any" min="0" value="{{ agua }}" onChange="{{ onAgua }}" style="flex: 1; min-width: 0; height: 46px; border: 0; background: transparent; font-size: 17px; font-variant-numeric: tabular-nums" />
+            </div>
+          </div>
+        </div>
+        <span style="font-size: 14px; color: #6A5B54">Lo que gasta esta receta en cada servicio.</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+          <label for="rapido-porc" style="font-size: 14px; font-weight: 600">Porciones</label>
+          <input id="rapido-porc" type="number" inputmode="numeric" step="1" min="1" value="{{ porc }}" onChange="{{ onPorc }}" style="width: 100%; height: 48px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; padding: 0 12px; font-size: 17px; font-variant-numeric: tabular-nums" />
+        </div>
+      </div>
+    </section>
+
+    <section style="background: #FFFFFF; border-radius: 20px; padding: 20px; border: 1px solid #E4DDD5; display: flex; flex-direction: column; gap: 14px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 20px; line-height: 1.25; font-weight: 600; letter-spacing: -0.01em">Tu ganancia</h2>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="rapido-g" style="font-size: 14px; font-weight: 600">Ganancia sobre el costo</label>
+        <div style="display: flex; align-items: center; height: 48px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; padding: 0 12px; gap: 6px">
+          <input id="rapido-g" type="number" inputmode="decimal" step="any" min="0" value="{{ g }}" onChange="{{ onG }}" style="flex: 1; min-width: 0; height: 46px; border: 0; background: transparent; font-size: 17px; font-variant-numeric: tabular-nums" />
+          <span style="color: #6A5B54; font-size: 17px">%</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <sc-for list="{{ chips }}" as="chip" hint-placeholder-count="3">
+          <button type="button" aria-pressed="{{ chip.pressed }}" onClick="{{ chip.onPick }}" style="min-height: 44px; padding: 0 18px; border-radius: 999px; font-weight: 600; cursor: pointer; background: {{ chip.bg }}; color: {{ chip.fg }}; border: 1px solid {{ chip.border }}">{{ chip.label }}</button>
+        </sc-for>
+      </div>
+      <fieldset style="border: 0; margin: 0; padding: 0; min-width: 0; position: relative; display: flex; flex-direction: column; gap: 6px">
+        <legend style="position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0">Redondeo</legend>
+        <span aria-hidden="true" style="font-size: 14px; font-weight: 600">Redondeo</span>
+        <div style="display: flex; gap: 4px; padding: 4px; background: #F7F3EE; border-radius: 12px">
+          <sc-for list="{{ steps }}" as="st" hint-placeholder-count="3">
+            <button type="button" aria-pressed="{{ st.pressed }}" onClick="{{ st.onPick }}" style="flex: 1; min-height: 44px; border: 0; border-radius: 9px; font-weight: 600; cursor: pointer; background: {{ st.bg }}; color: {{ st.fg }}">{{ st.label }}</button>
+          </sc-for>
+        </div>
+      </fieldset>
+      <fieldset style="border: 0; margin: 0; padding: 0; min-width: 0; position: relative; display: flex; flex-direction: column; gap: 6px">
+        <legend style="position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0">Cobrar IVA</legend>
+        <span aria-hidden="true" style="font-size: 14px; font-weight: 600">IVA</span>
+        <div style="display: flex; gap: 4px; padding: 4px; background: #F7F3EE; border-radius: 12px">
+          <sc-for list="{{ ivaOpts }}" as="io" hint-placeholder-count="2">
+            <button type="button" aria-pressed="{{ io.pressed }}" onClick="{{ io.onPick }}" style="flex: 1; min-height: 44px; border: 0; border-radius: 9px; font-weight: 600; cursor: pointer; background: {{ io.bg }}; color: {{ io.fg }}">{{ io.label }}</button>
+          </sc-for>
+        </div>
+      </fieldset>
+      <sc-if value="{{ ivaOn }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="rapido-iva" style="font-size: 14px; font-weight: 600">Tasa de IVA</label>
+          <div style="display: flex; align-items: center; height: 48px; border: 1px solid #CFC4B9; border-radius: 10px; background: #FFFFFF; padding: 0 12px; gap: 6px">
+            <input id="rapido-iva" type="number" inputmode="decimal" step="any" min="0" value="{{ iva }}" onChange="{{ onIva }}" style="flex: 1; min-width: 0; height: 46px; border: 0; background: transparent; font-size: 17px; font-variant-numeric: tabular-nums" />
+            <span style="color: #6A5B54; font-size: 17px">%</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap">
+          <sc-for list="{{ ivaChips }}" as="ic" hint-placeholder-count="2">
+            <button type="button" aria-pressed="{{ ic.pressed }}" onClick="{{ ic.onPick }}" style="min-height: 44px; padding: 0 18px; border-radius: 999px; font-weight: 600; cursor: pointer; background: {{ ic.bg }}; color: {{ ic.fg }}; border: 1px solid {{ ic.border }}">{{ ic.label }}</button>
+          </sc-for>
+        </div>
+        </div>
+      </sc-if>
+    </section>
+
+    <section style="background: #FFFFFF; border-radius: 20px; padding: 8px 20px; border: 1px solid #E4DDD5">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid #E4DDD5"><span style="color: #6A5B54">Costo total</span><span style="font-weight: 600; font-variant-numeric: tabular-nums">{{ costoTotal }}</span></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid #E4DDD5"><span style="color: #6A5B54">Costo por porción</span><span style="font-weight: 600; font-variant-numeric: tabular-nums">{{ costoPorcion }}</span></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 48px"><span style="color: #6A5B54">Ganancia real</span><span style="font-weight: 700; font-variant-numeric: tabular-nums; color: {{ acento }}">{{ gananciaReal }}</span></div>
+    </section>
+
+    <a href="Main.dc.html" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 52px; border-radius: 10px; text-decoration: none; font-weight: 600; color: #FFFFFF; background: {{ acento }}">Ver desglose completo</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"moneda":{"editor":"enum","options":["$","€","S/","Q","₡","Bs"],"default":"$","section":"Estilo"},"acento":{"editor":"color","options":["#B0245A","#8A4B2A","#2F6B5E","#3B4FA0"],"default":"#B0245A","section":"Estilo"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { mp: '193.05', horas: '2.5', tarifa: '80', gas: '14', luz: '3.60', agua: '1', porc: '12', g: '35', step: 10, ivaOn: false, iva: '16' };
+  }
+  num(v) { const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) ? n : 0; }
+  renderVals() {
+    const moneda = this.props.moneda ?? '$';
+    const acento = this.props.acento ?? '#B0245A';
+    const s = this.state;
+    const nf = new Intl.NumberFormat('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const pf = new Intl.NumberFormat('es-MX', { maximumFractionDigits: 1 });
+    const money = (n) => moneda + nf.format(n);
+    const pct = (n) => pf.format(n) + ' %';
+    const mp = Math.max(0, this.num(s.mp));
+    const mo = Math.max(0, this.num(s.horas)) * Math.max(0, this.num(s.tarifa));
+    const gi = Math.max(0, this.num(s.gas)) + Math.max(0, this.num(s.luz)) + Math.max(0, this.num(s.agua));
+    const ct = mp + mo + gi;
+    const g = Math.max(0, this.num(s.g));
+    const p0 = ct * (1 + g / 100);
+    const step = s.step;
+    const ivaOn = s.ivaOn;
+    const t = ivaOn ? Math.min(100, Math.max(0, this.num(s.iva))) : 0;
+    const pbruto = p0 * (1 + t / 100);
+    const p = step === 0 ? pbruto : Math.ceil(pbruto / step - 1e-9) * step;
+    const base = p / (1 + t / 100);
+    const ivaMonto = p - base;
+    const gr = base - ct;
+    const porc = Math.max(1, this.num(s.porc));
+    const share = (v) => (p > 0 ? Math.max(0, v / p * 100) : 0);
+    const defs = [
+      { label: 'Materia prima', v: mp, color: '#5B3A2E', border: '#5B3A2E' },
+      { label: 'Mano de obra', v: mo, color: '#C58A3D', border: '#C58A3D' },
+      { label: 'Gas, luz y agua', v: gi, color: '#E2D3C1', border: '#CFC4B9' },
+      { label: 'Ganancia', v: gr, color: acento, border: acento }
+    ];
+    if (ivaOn) defs.push({ label: 'IVA', v: ivaMonto, color: '#8F9AA5', border: '#CFC4B9' });
+    const ivaOpts = [{ v: false, label: 'Sin IVA' }, { v: true, label: 'Con IVA' }].map((o) => {
+      const on = s.ivaOn === o.v;
+      return {
+        label: o.label, pressed: on,
+        bg: on ? acento : 'transparent', fg: on ? '#FFFFFF' : '#2A1F1B',
+        onPick: () => this.setState({ ivaOn: o.v })
+      };
+    });
+    const ivaChips = [8, 16].map((v) => {
+      const on = this.num(s.iva) === v;
+      return {
+        label: v + ' %', pressed: on,
+        bg: on ? acento : '#FFFFFF', fg: on ? '#FFFFFF' : '#2A1F1B', border: on ? acento : '#CFC4B9',
+        onPick: () => this.setState({ iva: String(v) })
+      };
+    });
+    const segs = defs.map((d) => {
+      const sh = share(d.v);
+      return { label: d.label, amount: money(d.v), pct: pct(sh), width: sh + '%', color: d.color, border: d.border };
+    });
+    const chips = [25, 35, 50].map((v) => {
+      const on = this.num(s.g) === v;
+      return {
+        label: v + ' %', pressed: on,
+        bg: on ? acento : '#FFFFFF', fg: on ? '#FFFFFF' : '#2A1F1B', border: on ? acento : '#CFC4B9',
+        onPick: () => this.setState({ g: String(v) })
+      };
+    });
+    const steps = [{ v: 0, label: 'Sin' }, { v: 5, label: moneda + '5' }, { v: 10, label: moneda + '10' }].map((o) => {
+      const on = s.step === o.v;
+      return {
+        label: o.label, pressed: on,
+        bg: on ? acento : 'transparent', fg: on ? '#FFFFFF' : '#2A1F1B',
+        onPick: () => this.setState({ step: o.v })
+      };
+    });
+    return {
+      moneda, acento, segs, chips, steps, ivaOpts, ivaChips, ivaOn,
+      eyebrow: ivaOn ? 'Precio sugerido · IVA incluido' : 'Precio sugerido',
+      baseSinIva: money(base),
+      ivaMonto: money(ivaMonto),
+      iva: s.iva,
+      onIva: (e) => this.setState({ iva: e.target.value }),
+      gas: s.gas, luz: s.luz, agua: s.agua,
+      onGas: (e) => this.setState({ gas: e.target.value }),
+      onLuz: (e) => this.setState({ luz: e.target.value }),
+      onAgua: (e) => this.setState({ agua: e.target.value }),
+      mp: s.mp, horas: s.horas, tarifa: s.tarifa, porc: s.porc, g: s.g,
+      onMp: (e) => this.setState({ mp: e.target.value }),
+      onHoras: (e) => this.setState({ horas: e.target.value }),
+      onTarifa: (e) => this.setState({ tarifa: e.target.value }),
+      onPorc: (e) => this.setState({ porc: e.target.value }),
+      onG: (e) => this.setState({ g: e.target.value }),
+      precio: money(p),
+      precioPorcion: money(p / porc),
+      costoTotal: money(ct),
+      costoPorcion: money(ct / porc),
+      gananciaReal: money(gr)
+    };
+  }
+}
+</script>
+</body>
+</html>

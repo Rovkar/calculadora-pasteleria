@@ -1,0 +1,9 @@
+.ajustes { display: flex; flex-direction: column; gap: var(--space-4); max-width: 640px; margin: 0 auto; width: 100%; }
+.ajustes__text { margin: var(--space-3) 0 0; color: var(--ink); }
+.ajustes__text:empty { margin: 0; }
+.ajustes__steps { margin: var(--space-3) 0 0; padding-left: 22px; display: flex; flex-direction: column; gap: var(--space-2); }
+.ajustes__row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-4); }
+.ajustes__msg { margin-top: var(--space-4); }
+.ajustes__msg:empty { margin-top: 0; }
+.ajustes__footer { text-align: center; color: var(--muted); font-size: 14px; margin: var(--space-2) 0; }
+@media (max-width: 899px) { .ajustes__row > button { flex: 1 1 100%; } }

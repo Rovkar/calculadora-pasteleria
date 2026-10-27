@@ -1,0 +1,40 @@
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 4px;
+  border: 0;
+  background: var(--soft);
+  border-radius: var(--radius-segmented);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.segmented--full {
+  display: flex;
+  width: 100%;
+}
+
+.segmented__btn {
+  flex: 1 1 auto;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.segmented__btn[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.segmented__btn[aria-pressed='false']:hover {
+  background: rgba(42, 31, 27, 0.06);
+}

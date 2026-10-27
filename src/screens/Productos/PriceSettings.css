@@ -1,0 +1,10 @@
+.psettings { display: flex; flex-direction: column; gap: 20px; }
+.psettings__group { display: flex; flex-direction: column; gap: 8px; }
+.psettings__label { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0.02em; }
+.psettings__row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px 24px; }
+.psettings__row--end { display: flex; flex-wrap: wrap; align-items: flex-end; }
+.psettings__num { flex: 1 1 140px; min-width: 0; }
+.psettings__num--iva { flex: 0 1 160px; }
+.psettings__seg { display: flex; flex-direction: column; gap: 6px; max-width: 100%; }
+.psettings__seglabel { font-size: 14px; font-weight: 600; }
+.psettings__note { font-size: 13px; color: var(--muted); }
